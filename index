@@ -76,13 +76,13 @@
           <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd" /></svg>
           Dashboard
         </button>
+        <button id="tab-coord" class="px-4 py-2 rounded-lg text-slate-300 hover:text-white flex items-center gap-2 transition-all">
+          <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a.75.75 0 01.75.75V4h1.5A2.75 2.75 0 0115 6.75v.978a2.75 2.75 0 011.636 4.305l.999.999a.75.75 0 11-1.06 1.06l-.868-.868c-.46.333-1.017.526-1.622.526h-1.5v1.25a.75.75 0 01-1.5 0V12.75H8.25v1.25a.75.75 0 01-1.5 0V12.75h-1.5A2.75 2.75 0 012.5 10V6.75A2.75 2.75 0 015.25 4h1.5V2.75A.75.75 0 017.5 2zm0 3H5.25c-.69 0-1.25.56-1.25 1.25V10c0 .69.56 1.25 1.25 1.25h9.5c.69 0 1.25-.56 1.25-1.25V6.25c0-.69-.56-1.25-1.25-1.25H10z"/></svg>
+          Visão Geral
+        </button>
         <button id="tab-conf" class="px-4 py-2 rounded-lg text-slate-300 hover:text-white flex items-center gap-2 transition-all">
           <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M5.433 13.917l1.262-3.155A4 4 0 017.58 9.42l6.92-6.918a2.121 2.121 0 013 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 01-.65-.65z" /><path d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0010 3H4.75A2.75 2.75 0 002 5.75v9.5A2.75 2.75 0 004.75 18h9.5A2.75 2.75 0 0017 15.25V10a.75.75 0 00-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5z" /></svg>
           Configurar
-        </button>
-        <button id="tab-coord" class="px-4 py-2 rounded-lg text-slate-300 hover:text-white flex items-center gap-2 transition-all">
-          <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a.75.75 0 01.75.75V4h1.5A2.75 2.75 0 0115 6.75v.978a2.75 2.75 0 011.636 4.305l.999.999a.75.75 0 11-1.06 1.06l-.868-.868c-.46.333-1.017.526-1.622.526h-1.5v1.25a.75.75 0 01-1.5 0V12.75H8.25v1.25a.75.75 0 01-1.5 0V12.75h-1.5A2.75 2.75 0 012.5 10V6.75A2.75 2.75 0 015.25 4h1.5V2.75A.75.75 0 017.5 2zm0 3H5.25c-.69 0-1.25.56-1.25 1.25V10c0 .69.56 1.25 1.25 1.25h9.5c.69 0 1.25-.56 1.25-1.25V6.25c0-.69-.56-1.25-1.25-1.25H10z"/></svg>
-          Coordenação
         </button>
       </div>
     </header>
@@ -93,9 +93,9 @@
           <svg class="w-6 h-6 text-sky-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.572a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" /></svg>
           Filtros
         </h2>
-        <div class="grid sm:grid-cols-2 lg:grid-cols-6 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-slate-400 mb-1">Pessoa</label>
+        <div class="grid grid-cols-12 gap-3 items-end">
+          <div class="col-span-2">
+            <label class="block text-sm font-medium text-slate-400 mb-1">Pessoa <span class="text-rose-400">*</span></label>
             <div id="f-pessoa-select" class="relative">
               <button id="f-pessoa-toggle" type="button" class="w-full pill rounded-lg px-3 py-2 text-left text-sm" aria-haspopup="true" aria-expanded="false">
                 <span id="f-pessoa-summary" class="text-slate-300">— selecione —</span>
@@ -103,8 +103,8 @@
               <div id="f-pessoa-panel" class="hidden card rounded-xl p-3 z-50 flex flex-col shadow-2xl max-h-80"></div>
             </div>
           </div>
-          <div>
-            <label class="block text-sm font-medium text-slate-400 mb-1">Operação</label>
+          <div class="col-span-2">
+            <label class="block text-sm font-medium text-slate-400 mb-1">Operação <span class="text-rose-400">*</span></label>
             <div id="f-operacao-select" class="relative">
               <button id="f-operacao-toggle" type="button" class="w-full pill rounded-lg px-3 py-2 text-left text-sm" aria-haspopup="true" aria-expanded="false" disabled>
                 <span id="f-operacao-summary" class="text-slate-300">— selecione —</span>
@@ -112,8 +112,17 @@
               <div id="f-operacao-panel" class="hidden card rounded-xl p-3 z-50 flex flex-col shadow-2xl max-h-80"></div>
             </div>
           </div>
-          <div class="lg:col-span-2">
-            <label class="block text-sm font-medium text-slate-400 mb-1">Páginas de Queda</label>
+          <div class="col-span-2">
+            <label class="block text-sm font-medium text-slate-400 mb-1">Suboperação <span class="text-rose-400">*</span></label>
+            <div id="f-suboperacao-select" class="relative">
+              <button id="f-suboperacao-toggle" type="button" class="w-full pill rounded-lg px-3 py-2 text-left text-sm" aria-haspopup="true" aria-expanded="false" disabled>
+                <span id="f-suboperacao-summary" class="text-slate-300">— selecione —</span>
+              </button>
+              <div id="f-suboperacao-panel" class="hidden card rounded-xl p-3 z-50 flex flex-col shadow-2xl max-h-80"></div>
+            </div>
+          </div>
+          <div class="col-span-2">
+            <label class="block text-sm font-medium text-slate-400 mb-1">Páginas de Queda <span class="text-rose-400">*</span></label>
             <div id="pq-select" class="relative">
               <button id="pq-toggle" type="button" class="w-full pill rounded-lg px-3 py-2 text-left text-sm" aria-haspopup="true" aria-expanded="false">
                 <span id="pq-summary" class="text-slate-300">— selecione —</span>
@@ -121,14 +130,14 @@
               <div id="pq-panel" class="hidden card rounded-xl p-3 z-50 flex flex-col shadow-2xl max-h-80"></div>
             </div>
           </div>
-          <div>
+          <div class="col-span-2">
             <label class="block text-sm font-medium text-slate-400 mb-1">Período</label>
             <div class="grid grid-cols-2 gap-2">
               <input id="f-start" type="date" class="w-full pill rounded-lg px-3 py-2 text-sm">
               <input id="f-end" type="date" class="w-full pill rounded-lg px-3 py-2 text-sm">
             </div>
           </div>
-          <div class="grid grid-cols-2 gap-2">
+          <div class="col-span-2 grid grid-cols-2 gap-2">
               <div>
                 <label class="block text-sm font-medium text-slate-400 mb-1">Agrupar</label>
                 <select id="f-gran" class="w-full pill rounded-lg px-3 py-2 text-sm">
@@ -167,6 +176,7 @@
           <input type="hidden" id="cfg-id">
           <div><label class="block text-sm text-slate-400 mb-1">Pessoa</label><input id="cfg-pessoa" class="w-full pill rounded-lg px-3 py-2" placeholder="Ex: Igor"></div>
           <div><label class="block text-sm text-slate-400 mb-1">Operação</label><input id="cfg-operacao" class="w-full pill rounded-lg px-3 py-2" placeholder="Ex: JN CC US"></div>
+          <div><label class="block text-sm text-slate-400 mb-1">Suboperação</label><input id="cfg-suboperacao" class="w-full pill rounded-lg px-3 py-2" placeholder="Ex: US A"></div>
           <div><label class="block text-sm text-slate-400 mb-1">Página de Queda</label><input id="cfg-pagina" class="w-full pill rounded-lg px-3 py-2" placeholder="Ex: PQ 1 – US Cards"></div>
           <div><label class="block text-sm text-slate-400 mb-1">Parte</label><select id="cfg-parte" class="w-full pill rounded-lg px-3 py-2"><option>Quiz</option><option selected>P1</option><option>P2</option></select></div>
           <div><label class="block text-sm text-slate-400 mb-1">Canal</label><input id="cfg-canal" class="w-full pill rounded-lg px-3 py-2" placeholder="Ex: utm_medium=rewarded"></div>
@@ -246,7 +256,7 @@
     <section id="view-coord" class="hidden fade-in space-y-6">
       <div class="card rounded-2xl p-6 space-y-4">
         <div class="flex items-center justify-between flex-wrap gap-3">
-          <h2 class="text-lg font-bold text-slate-100">Visão de Coordenação</h2>
+          <h2 class="text-lg font-bold text-slate-100">Visão Geral</h2>
           <span class="text-xs text-slate-400">Acesso restrito · Sugestões baseadas nas últimas 4 horas (descartando a mais recente)</span>
         </div>
         <div class="grid sm:grid-cols-2 gap-4">
@@ -560,7 +570,7 @@ function todayIso(){
         }
         var coordAgr = byId('coord-agrupamento');
         if (coordAgr) {
-            coordAgr.onchange = function(){ loadCoordinationData(); };
+            coordAgr.onchange = function(){};
         }
         var coordBtn = byId('coord-btn-carregar');
         if (coordBtn) {
@@ -579,19 +589,19 @@ function todayIso(){
     }
 
     function loadCoordinationData(forceReload){
-        if (!CoordAccess.granted) return;
         var pessoaSel = byId('coord-pessoa');
         var pessoa = pessoaSel ? pessoaSel.value : '';
         var agrupSel = byId('coord-agrupamento');
         var agrupamento = agrupSel ? agrupSel.value : 'day';
         if (!pessoa) {
+            showToast('Selecione uma Pessoa e clique em "Atualizar visão".', 'info');
             renderCoordination({ operations: [], message: 'Selecione uma pessoa para visualizar os dados.' });
             return;
         }
-        if (COORD.loading && !forceReload) return;
+        if (COORD.loading) return;
         COORD.loading = true;
-        setCoordinationLoading('Carregando visão de coordenação...');
-        showLoading('Carregando visão de coordenação...');
+        setCoordinationLoading('Carregando visão Geral...');
+        showLoading('Carregando visão Geral...');
         google.script.run
             .withSuccessHandler(function(res){
                 COORD.loading = false;
@@ -606,23 +616,21 @@ function todayIso(){
             .getCoordinationData({ pessoa: pessoa, agrupamento: agrupamento });
     }
 
-    function updateCoordinationOperation(opName){
+    function updateCoordinationOperation(opName, subopName){
         if (!opName) return;
         var op = COORD.operationMap[opName];
         if (!op) return;
-        var container = byId('coord-table-' + slugifyCoord(opName));
+        var key = subopName ? (opName + '--' + subopName) : opName;
+        var container = byId('coord-table-' + slugifyCoord(key));
         if (!container) return;
-        container.innerHTML = buildCoordinationTable(op, COORD.cpcTargets[opName]);
+        var scope = subopName ? ((op.suboperacoes||[]).find(function(s){ return s.suboperacao===subopName; }) || {}) : op;
+        container.innerHTML = buildCoordinationTable(scope);
     }
 
     // MODIFICADO: renderCoordination - removidos os controles de ordenação
     function renderCoordination(res){
         var container = byId('coord-results');
         if (!container) return;
-        if (!CoordAccess.granted) {
-            container.innerHTML = '<div class="card rounded-2xl p-6 text-slate-200 border border-slate-700/60 bg-slate-900/40">Área restrita. Informe a senha para visualizar.</div>';
-            return;
-        }
         if (res && res.error) {
             container.innerHTML = '<div class="card rounded-2xl p-6 border border-rose-500/40 bg-rose-900/20 text-rose-100">'+escapeHtml(res.error)+'</div>';
             return;
@@ -648,56 +656,32 @@ function todayIso(){
             var opName = op.operacao || 'Operação';
             COORD.operationMap[opName] = op;
             var card = document.createElement('div');
-            card.className = 'card rounded-2xl p-6 space-y-4';
+            card.className = 'rounded-2xl p-6 space-y-4 border-2 border-violet-500/40 bg-gradient-to-br from-violet-900/30 via-slate-900/70 to-indigo-900/30 shadow-2xl';
 
-            // Cabeçalho: nome da operação + campo CPC Alvo
             var header = document.createElement('div');
-            header.className = 'flex flex-wrap items-center justify-between gap-3';
+            header.className = 'flex flex-wrap items-center justify-between gap-3 border-b border-indigo-400/30 pb-3';
             var title = document.createElement('div');
-            title.className = 'text-lg font-bold text-slate-100';
+            title.className = 'text-lg font-bold text-indigo-200';
             title.textContent = opName;
             header.appendChild(title);
-
-            var inputWrap = document.createElement('label');
-            inputWrap.className = 'flex items-center gap-2 text-sm text-slate-300';
-            inputWrap.innerHTML = '<span>CPC Alvo</span>';
-            var input = document.createElement('input');
-            input.type = 'number';
-            input.step = '0.01';
-            input.placeholder = '0.00';
-            input.className = 'pill rounded-lg px-3 py-2 text-sm w-28';
-            if (COORD.cpcTargets.hasOwnProperty(opName) && COORD.cpcTargets[opName] !== undefined) {
-                var val = COORD.cpcTargets[opName];
-                input.value = (val === null || val === undefined) ? '' : val;
-            }
-            input.dataset.operation = opName;
-            input.addEventListener('input', function(){
-                var name = this.dataset.operation;
-                if (!name) return;
-                var v = parseFloat(this.value);
-                if (isNaN(v)) {
-                    delete COORD.cpcTargets[name];
-                } else {
-                    COORD.cpcTargets[name] = v;
-                }
-                updateCoordinationOperation(name);
-            });
-            input.addEventListener('blur', function(){ updateCoordinationOperation(this.dataset.operation); });
-            inputWrap.appendChild(input);
-            header.appendChild(inputWrap);
             card.appendChild(header);
-
-            // Seção 1: Comparativo — Total da Página
-            var totalPageSection = document.createElement('div');
-            totalPageSection.innerHTML = buildCoordTotalPageHtml(op.compareByPage || []);
-            card.appendChild(totalPageSection);
-
-            // Seção 2: Comparativo por Blocos (com sugestões)
-            var tableContainer = document.createElement('div');
-            var slug = slugifyCoord(opName);
-            tableContainer.id = 'coord-table-' + slug;
-            tableContainer.innerHTML = buildCoordinationTable(op, COORD.cpcTargets[opName]);
-            card.appendChild(tableContainer);
+            (op.suboperacoes || []).forEach(function(sub){
+              var subWrap = document.createElement('div');
+              subWrap.className = 'rounded-xl border-2 border-amber-400/40 bg-gradient-to-r from-slate-900/70 via-fuchsia-900/20 to-cyan-900/20 p-4 space-y-3 shadow-lg shadow-fuchsia-900/30';
+              var subHeader = document.createElement('div');
+              subHeader.className = 'sticky top-0 z-10 bg-gradient-to-r from-amber-500/20 to-fuchsia-500/20 backdrop-blur px-3 py-2 rounded-lg text-amber-100 font-bold border border-amber-300/30';
+              subHeader.textContent = 'Suboperação: ' + (sub.suboperacao || '—');
+              subWrap.appendChild(subHeader);
+              var totalPageSection = document.createElement('div');
+              totalPageSection.innerHTML = buildCoordTotalPageHtml(sub.compareByPage || []);
+              subWrap.appendChild(totalPageSection);
+              var tableContainer = document.createElement('div');
+              var slug = slugifyCoord(opName + '--' + (sub.suboperacao || ''));
+              tableContainer.id = 'coord-table-' + slug;
+              tableContainer.innerHTML = buildCoordinationTable(sub);
+              subWrap.appendChild(tableContainer);
+              card.appendChild(subWrap);
+            });
 
             frag.appendChild(card);
         });
@@ -707,7 +691,6 @@ function todayIso(){
     }
 
     function rerenderCoordination(){
-        if (!CoordAccess.granted) return;
         if (COORD.lastResponse) {
             renderCoordination(COORD.lastResponse);
         }
@@ -832,7 +815,7 @@ function todayIso(){
     }
 
     // MODIFICADO: buildCoordinationTable - cabeçalhos da tabela agora são clicáveis
-    function buildCoordinationTable(op, targetValue){
+    function buildCoordinationTable(op){
         var blocks = (op && op.blocks) ? op.blocks.slice() : [];
         if (!blocks.length) {
             return '<div class="card rounded-xl p-4 border border-slate-700/60 bg-slate-900/40 text-sm text-slate-300">Sem dados disponíveis para esta operação nas últimas horas.</div>';
@@ -847,8 +830,6 @@ function todayIso(){
         blocks.forEach(function(block){
             basisMap[String(block.page||'')+'||'+String(block.label||'')] = block.suggestionBasis || {};
         });
-        var target = parseFloat(targetValue);
-        if (!isFinite(target)) target = NaN;
 
         var grouped = { Quiz: {}, P1: {}, P2: {} };
         blocks.forEach(function(block){
@@ -860,12 +841,13 @@ function todayIso(){
             grouped[part][label].push({
                 page: block.page || '-',
                 metrics: metrics,
-                suggestion: getCoordinationSuggestion(block, target, basisMap)
+                suggestion: getCoordinationSuggestion(block, NaN, basisMap)
             });
         });
 
-        function tableFor(list){
+        function tableFor(list, label){
             if (!list || !list.length) return '';
+            var isOfferwall = String(label || '').toLowerCase().includes('offerwall');
             var sorted = sortBlockEntries(list, COORD_BLOCK_SORT);
             // Filtra linhas zeradas (sem receita, impressões e cliques)
             sorted = sorted.filter(function(item){
@@ -873,8 +855,18 @@ function todayIso(){
                 return (m.revenue || 0) > 0 || (m.impressions || 0) > 0 || (m.clicks || 0) > 0;
             });
             if (!sorted.length) return '';
+            function calcCpcCorrigido(metrics){
+                var revenue = Number(metrics.revenue || 0);
+                var requests = Number(metrics.requests || 0);
+                var coverageRate = Number(metrics.coverage || 0) / 100;
+                var impressions = Number(metrics.impressions || 0);
+                var clicks = Number(metrics.clicks || 0);
+                var correctedClicks = ((requests * coverageRate) - impressions) + clicks;
+                return correctedClicks > 0 ? (revenue / correctedClicks) : 0;
+            }
             var rows = sorted.map(function(item){
                 var metrics = item.metrics || {};
+                var cpcCorrigidoCell = isOfferwall ? ('<td class="py-2 px-2 text-right">'+money(calcCpcCorrigido(metrics), 3)+'</td>') : '';
                 return '<tr class="border-t border-slate-700/60 hover:bg-slate-800/50">'
                     + '<td class="py-2 px-2 text-slate-300">'+escapeHtml(item.page || '-')+'</td>'
                     + '<td class="py-2 px-2 text-right">'+money(metrics.revenue || 0)+'</td>'
@@ -885,7 +877,7 @@ function todayIso(){
                     + '<td class="py-2 px-2 text-right">'+num(metrics.requests || 0, 0)+'</td>'
                     + '<td class="py-2 px-2 text-right">'+pct(metrics.coverage || 0, 2)+'</td>'
                     + '<td class="py-2 px-2 text-right">'+money(metrics.cpc || 0, 3)+'</td>'
-                    + '<td class="py-2 px-2 align-top">'+renderCoordinationSuggestionCell(item.suggestion)+'</td>'
+                    + cpcCorrigidoCell
                     + '</tr>';
             }).join('');
             var head = '<thead class="text-slate-400"><tr>'
@@ -898,7 +890,7 @@ function todayIso(){
                 + '<th class="text-right py-2 px-2 cursor-pointer" onclick="sortByCoordBlockHeader(\'requests\')">Solicitações'+coordBlockSortIndicator('requests')+'</th>'
                 + '<th class="text-right py-2 px-2 cursor-pointer" onclick="sortByCoordBlockHeader(\'coverage\')">Cobertura'+coordBlockSortIndicator('coverage')+'</th>'
                 + '<th class="text-right py-2 px-2 cursor-pointer" onclick="sortByCoordBlockHeader(\'cpc\')">CPC'+coordBlockSortIndicator('cpc')+'</th>'
-                + '<th class="text-left py-2 px-2">Sugestão de precificação</th>'
+                + (isOfferwall ? '<th class="text-right py-2 px-2">CPC Corrigido</th>' : '')
                 + '</tr></thead>';
             return '<div class="overflow-auto"><table class="w-full text-sm">'+head+'<tbody>'+rows+'</tbody></table></div>';
         }
@@ -1099,7 +1091,7 @@ function todayIso(){
     };
     // ============================================================
 
-    var CFG = { rows: [], pessoas: [], opsByPessoa: {}, paginasByOp: {} };
+    var CFG = { rows: [], pessoas: [], opsByPessoa: {}, subopsByOp: {}, paginasBySubop: {} };
     var CFG_REDE_EMPTY_VALUE = '__empty__';
     var CFG_PARTE_ORDER = { Quiz: 0, P1: 1, P2: 2 };
     function createCfgListDefaults(){
@@ -1120,9 +1112,10 @@ function todayIso(){
     // ADICIONADO: Novos estados para filtros de Pessoa e Operação
     var FILTRO_PESSOA = { options: [], selected: '', open: false, searchTerm: '', placeholder: '— selecione —' };
     var FILTRO_OPERACAO = { options: [], selected: '', open: false, searchTerm: '', placeholder: '— selecione —', disabled: true };
+    var FILTRO_SUBOPERACAO = { options: [], selected: '', open: false, searchTerm: '', placeholder: '— selecione —', disabled: true };
     var CHART = { inst: null };
-    var COORD = { operations: [], operationMap: {}, cpcTargets: {}, loading: false, lastResponse: null };
-    var CoordAccess = { granted: false, hash: '87402fdebedf4d5bf24d2f80aca3ae0197e8837d16a9c0155f366343c1f6a4bf', fallback: 'b10d26f7', pending: null, verifying: false };
+    var COORD = { operations: [], operationMap: {}, loading: false, lastResponse: null };
+    var CoordAccess = { granted: true, hash: '87402fdebedf4d5bf24d2f80aca3ae0197e8837d16a9c0155f366343c1f6a4bf', fallback: 'b10d26f7', pending: null, verifying: false };
     var SYNC_TIMERS = {};
 
     function showToast(message, type = 'info') {
@@ -1151,11 +1144,7 @@ function todayIso(){
       };
 
       function setActiveTab(tab){
-        if (tab === 'coord' && !CoordAccess.granted) {
-          showCoordPasswordModal(function(){ setActiveTab('coord'); });
-          return;
-        }
-        Object.keys(tabMap).forEach(function(key){
+                Object.keys(tabMap).forEach(function(key){
           var cfg = tabMap[key];
           if (!cfg.button || !cfg.view) return;
           var isActive = (key === tab);
@@ -1166,9 +1155,7 @@ function todayIso(){
             cfg.button.classList.remove('bg-blue-600','text-white');
           }
         });
-        if (tab === 'coord') {
-          loadCoordinationData();
-        }
+        
       }
 
       Object.keys(tabMap).forEach(function(key){
@@ -1197,10 +1184,11 @@ function todayIso(){
           CFG.rows = Array.isArray(data.rows) ? data.rows.slice() : [];
           CFG.pessoas = Array.isArray(data.pessoas) ? data.pessoas.slice() : [];
           CFG.opsByPessoa = data.opsByPessoa || {};
-          CFG.paginasByOp = data.paginasByOp || {};
+          CFG.subopsByOp = data.subopsByOp || {};
+          CFG.paginasBySubop = data.paginasBySubop || {};
           for (var key in data) {
             if (!data.hasOwnProperty(key)) continue;
-            if (key === 'rows' || key === 'pessoas' || key === 'opsByPessoa' || key === 'paginasByOp') continue;
+            if (key === 'rows' || key === 'pessoas' || key === 'opsByPessoa' || key === 'subopsByOp' || key === 'paginasBySubop') continue;
             CFG[key] = data[key];
           }
           fillPessoa(CFG.pessoas || []);
@@ -1235,15 +1223,26 @@ function todayIso(){
         updateCustomSelectSummary('f-operacao', FILTRO_OPERACAO);
         if (!ops.length) FILTRO_OPERACAO.selected = '';
       }
+      function applySuboperacoes(pessoa, operacao){
+        var key = pessoa + '||' + operacao;
+        var subops = (CFG.subopsByOp && operacao) ? (CFG.subopsByOp[key] || []) : [];
+        FILTRO_SUBOPERACAO.options = (subops || []).slice();
+        if (FILTRO_SUBOPERACAO.selected && !FILTRO_SUBOPERACAO.options.includes(FILTRO_SUBOPERACAO.selected)) {
+          FILTRO_SUBOPERACAO.selected = '';
+        }
+        setCustomSelectDisabled('f-suboperacao', FILTRO_SUBOPERACAO, !subops.length);
+        updateCustomSelectSummary('f-suboperacao', FILTRO_SUBOPERACAO);
+      }
 
       applyOperacoes(FILTRO_PESSOA.selected);
+      applySuboperacoes(FILTRO_PESSOA.selected, FILTRO_OPERACAO.selected);
 
       var coordSel = byId('coord-pessoa');
       if (coordSel) {
         var previous = coordSel.value;
         coordSel.innerHTML = '<option value="">— selecione —</option>' + (list||[]).map(function(p){return '<option>'+escapeHtml(p)+'</option>';}).join('');
         if (previous && list && list.indexOf(previous) >= 0) coordSel.value = previous;
-        coordSel.onchange = function(){ loadCoordinationData(); };
+        coordSel.onchange = function(){};
       }
     }
     
@@ -1302,6 +1301,7 @@ function todayIso(){
         // Fechar outros painéis abertos
         if (FILTRO_PESSOA.open && idPrefix !== 'f-pessoa') { FILTRO_PESSOA.open = false; byId('f-pessoa-panel').classList.add('hidden'); }
         if (FILTRO_OPERACAO.open && idPrefix !== 'f-operacao') { FILTRO_OPERACAO.open = false; byId('f-operacao-panel').classList.add('hidden'); }
+        if (FILTRO_SUBOPERACAO.open && idPrefix !== 'f-suboperacao') { FILTRO_SUBOPERACAO.open = false; byId('f-suboperacao-panel').classList.add('hidden'); }
         if (PQ.open && idPrefix !== 'pq') { PQ.open = false; byId('pq-panel').classList.add('hidden'); }
 
         model.open = true;
@@ -1487,6 +1487,7 @@ function todayIso(){
         // Fechar outros painéis abertos
         if (FILTRO_PESSOA.open) { FILTRO_PESSOA.open = false; byId('f-pessoa-panel').classList.add('hidden'); }
         if (FILTRO_OPERACAO.open) { FILTRO_OPERACAO.open = false; byId('f-operacao-panel').classList.add('hidden'); }
+        if (FILTRO_SUBOPERACAO.open) { FILTRO_SUBOPERACAO.open = false; byId('f-suboperacao-panel').classList.add('hidden'); }
         
         PQ.open = true;
         renderPQOptions();
@@ -1533,6 +1534,14 @@ function todayIso(){
             pnl = byId('f-operacao-panel');
             if (!((tgl && tgl.contains(evt.target)) || (pnl && pnl.contains(evt.target)))) {
                 FILTRO_OPERACAO.open = false;
+                if (pnl) pnl.classList.add('hidden');
+            }
+        }
+        if (FILTRO_SUBOPERACAO.open) {
+            tgl = byId('f-suboperacao-toggle');
+            pnl = byId('f-suboperacao-panel');
+            if (!((tgl && tgl.contains(evt.target)) || (pnl && pnl.contains(evt.target)))) {
+                FILTRO_SUBOPERACAO.open = false;
                 if (pnl) pnl.classList.add('hidden');
             }
         }
@@ -1664,13 +1673,14 @@ function todayIso(){
         var params = {
           pessoa: FILTRO_PESSOA.selected,
           operacao: FILTRO_OPERACAO.selected,
+          suboperacao: FILTRO_SUBOPERACAO.selected,
           paginasSelecionadas: PQ.selected.slice(),
           startDate: startValue || '',
           endDate: endValue || '',
           granularity: byId('f-gran').value || 'hour'
         };
-        if (!params.pessoa || !params.operacao || !params.paginasSelecionadas.length) { 
-            showToast('Selecione Pessoa, Operação e pelo menos uma Página de Queda.', 'error'); 
+        if (!params.pessoa || !params.operacao || !params.suboperacao || !params.paginasSelecionadas.length) { 
+            showToast('Selecione Pessoa, Operação, Suboperação e pelo menos uma Página de Queda.', 'error'); 
             return; 
         }
         showLoading('Carregando dados do dashboard...');
@@ -2897,6 +2907,7 @@ function todayIso(){
         byId('cfg-id').value = item.id;
         byId('cfg-pessoa').value = item.pessoa;
         byId('cfg-operacao').value = item.operacao;
+        byId('cfg-suboperacao').value = item.suboperacao || '';
         byId('cfg-pagina').value = item.pagina;
         byId('cfg-parte').value = item.parte;
         byId('cfg-canal').value = item.canal;
@@ -2925,11 +2936,11 @@ function todayIso(){
     }
 
     function wireCfgForm(){
-      byId('btn-limpar').onclick=function(){byId('cfg-id').value='';byId('cfg-pessoa').value='';byId('cfg-operacao').value='';byId('cfg-pagina').value='';byId('cfg-parte').value='P1';byId('cfg-canal').value='';byId('cfg-urls').value=''; byId('cfg-rede').value=''; byId('cfg-moeda').value='USD';};
+      byId('btn-limpar').onclick=function(){byId('cfg-id').value='';byId('cfg-pessoa').value='';byId('cfg-operacao').value='';byId('cfg-suboperacao').value='';byId('cfg-pagina').value='';byId('cfg-parte').value='P1';byId('cfg-canal').value='';byId('cfg-urls').value=''; byId('cfg-rede').value=''; byId('cfg-moeda').value='USD';};
       byId('form-cfg').onsubmit = function(e){
         e.preventDefault();
-        var payload={id:byId('cfg-id').value,pessoa:(byId('cfg-pessoa').value||'').trim(),operacao:(byId('cfg-operacao').value||'').trim(),pagina:(byId('cfg-pagina').value||'').trim(),parte:(byId('cfg-parte').value||'').trim(),canal:(byId('cfg-canal').value||'').trim(),urls:(byId('cfg-urls').value||'').trim(),rede:(byId('cfg-rede').value||'').trim(),moeda:(byId('cfg-moeda').value||'USD').trim().toUpperCase()};
-        if(!payload.pessoa||!payload.operacao||!payload.pagina||!payload.parte){ showToast('Preencha Pessoa, Operação, Página e Parte.', 'error'); return; }
+        var payload={id:byId('cfg-id').value,pessoa:(byId('cfg-pessoa').value||'').trim(),operacao:(byId('cfg-operacao').value||'').trim(),suboperacao:(byId('cfg-suboperacao').value||'').trim(),pagina:(byId('cfg-pagina').value||'').trim(),parte:(byId('cfg-parte').value||'').trim(),canal:(byId('cfg-canal').value||'').trim(),urls:(byId('cfg-urls').value||'').trim(),rede:(byId('cfg-rede').value||'').trim(),moeda:(byId('cfg-moeda').value||'USD').trim().toUpperCase()};
+        if(!payload.pessoa||!payload.operacao||!payload.suboperacao||!payload.pagina||!payload.parte){ showToast('Preencha Pessoa, Operação, Suboperação, Página e Parte.', 'error'); return; }
 
         showLoading('Salvando configuração...');
         google.script.run
@@ -2961,15 +2972,36 @@ function todayIso(){
             FILTRO_OPERACAO.searchTerm = '';
             setCustomSelectDisabled('f-operacao', FILTRO_OPERACAO, !ops.length);
             updateCustomSelectSummary('f-operacao', FILTRO_OPERACAO);
+            FILTRO_SUBOPERACAO.options = [];
+            FILTRO_SUBOPERACAO.selected = '';
+            FILTRO_SUBOPERACAO.searchTerm = '';
+            setCustomSelectDisabled('f-suboperacao', FILTRO_SUBOPERACAO, true);
+            updateCustomSelectSummary('f-suboperacao', FILTRO_SUBOPERACAO);
             resetPQ(); // Reseta páginas
         });
         
         wireCustomSelect('f-operacao', FILTRO_OPERACAO, function(operacao) {
-            // Callback "onchange" para Operação
             var key = FILTRO_PESSOA.selected + '||' + operacao;
-            var pags = (CFG.paginasByOp && CFG.paginasByOp[key]) ? CFG.paginasByOp[key] : [];
+            var subops = (CFG.subopsByOp && CFG.subopsByOp[key]) ? CFG.subopsByOp[key] : [];
+            FILTRO_SUBOPERACAO.options = (subops || []).slice();
+            FILTRO_SUBOPERACAO.selected = '';
+            FILTRO_SUBOPERACAO.searchTerm = '';
+            setCustomSelectDisabled('f-suboperacao', FILTRO_SUBOPERACAO, !subops.length);
+            updateCustomSelectSummary('f-suboperacao', FILTRO_SUBOPERACAO);
+            resetPQ();
+        });
+        wireCustomSelect('f-suboperacao', FILTRO_SUBOPERACAO, function(suboperacao) {
+            var key = FILTRO_PESSOA.selected + '||' + FILTRO_OPERACAO.selected + '||' + suboperacao;
+            var pags = (CFG.paginasBySubop && CFG.paginasBySubop[key]) ? CFG.paginasBySubop[key] : [];
             setPQOptions(pags);
         });
+        var coordBtn = byId('coord-btn-carregar');
+        if (coordBtn) {
+          coordBtn.onclick = function(){
+            showToast('Atualizando visão geral...', 'info');
+            loadCoordinationData(true);
+          };
+        }
         // FIM ADIÇÃO
 
         setupCfgListControls();
