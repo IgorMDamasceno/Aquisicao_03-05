@@ -113,6 +113,15 @@
             </div>
           </div>
           <div class="lg:col-span-2">
+            <label class="block text-sm font-medium text-slate-400 mb-1">Suboperação</label>
+            <div id="f-suboperacao-select" class="relative">
+              <button id="f-suboperacao-toggle" type="button" class="w-full pill rounded-lg px-3 py-2 text-left text-sm" aria-haspopup="true" aria-expanded="false" disabled>
+                <span id="f-suboperacao-summary" class="text-slate-300">— selecione —</span>
+              </button>
+              <div id="f-suboperacao-panel" class="hidden card rounded-xl p-3 z-50 flex flex-col shadow-2xl max-h-80"></div>
+            </div>
+          </div>
+          <div class="lg:col-span-2">
             <label class="block text-sm font-medium text-slate-400 mb-1">Páginas de Queda</label>
             <div id="pq-select" class="relative">
               <button id="pq-toggle" type="button" class="w-full pill rounded-lg px-3 py-2 text-left text-sm" aria-haspopup="true" aria-expanded="false">
@@ -167,6 +176,7 @@
           <input type="hidden" id="cfg-id">
           <div><label class="block text-sm text-slate-400 mb-1">Pessoa</label><input id="cfg-pessoa" class="w-full pill rounded-lg px-3 py-2" placeholder="Ex: Igor"></div>
           <div><label class="block text-sm text-slate-400 mb-1">Operação</label><input id="cfg-operacao" class="w-full pill rounded-lg px-3 py-2" placeholder="Ex: JN CC US"></div>
+          <div><label class="block text-sm text-slate-400 mb-1">Suboperação</label><input id="cfg-suboperacao" class="w-full pill rounded-lg px-3 py-2" placeholder="Ex: US A"></div>
           <div><label class="block text-sm text-slate-400 mb-1">Página de Queda</label><input id="cfg-pagina" class="w-full pill rounded-lg px-3 py-2" placeholder="Ex: PQ 1 – US Cards"></div>
           <div><label class="block text-sm text-slate-400 mb-1">Parte</label><select id="cfg-parte" class="w-full pill rounded-lg px-3 py-2"><option>Quiz</option><option selected>P1</option><option>P2</option></select></div>
           <div><label class="block text-sm text-slate-400 mb-1">Canal</label><input id="cfg-canal" class="w-full pill rounded-lg px-3 py-2" placeholder="Ex: utm_medium=rewarded"></div>
@@ -1099,7 +1109,7 @@ function todayIso(){
     };
     // ============================================================
 
-    var CFG = { rows: [], pessoas: [], opsByPessoa: {}, paginasByOp: {} };
+    var CFG = { rows: [], pessoas: [], opsByPessoa: {}, subopsByOp: {}, paginasBySubop: {} };
     var CFG_REDE_EMPTY_VALUE = '__empty__';
     var CFG_PARTE_ORDER = { Quiz: 0, P1: 1, P2: 2 };
     function createCfgListDefaults(){
@@ -1120,6 +1130,7 @@ function todayIso(){
     // ADICIONADO: Novos estados para filtros de Pessoa e Operação
     var FILTRO_PESSOA = { options: [], selected: '', open: false, searchTerm: '', placeholder: '— selecione —' };
     var FILTRO_OPERACAO = { options: [], selected: '', open: false, searchTerm: '', placeholder: '— selecione —', disabled: true };
+    var FILTRO_SUBOPERACAO = { options: [], selected: '', open: false, searchTerm: '', placeholder: '— selecione —', disabled: true };
     var CHART = { inst: null };
     var COORD = { operations: [], operationMap: {}, cpcTargets: {}, loading: false, lastResponse: null };
     var CoordAccess = { granted: false, hash: '87402fdebedf4d5bf24d2f80aca3ae0197e8837d16a9c0155f366343c1f6a4bf', fallback: 'b10d26f7', pending: null, verifying: false };
@@ -1197,10 +1208,11 @@ function todayIso(){
           CFG.rows = Array.isArray(data.rows) ? data.rows.slice() : [];
           CFG.pessoas = Array.isArray(data.pessoas) ? data.pessoas.slice() : [];
           CFG.opsByPessoa = data.opsByPessoa || {};
-          CFG.paginasByOp = data.paginasByOp || {};
+          CFG.subopsByOp = data.subopsByOp || {};
+          CFG.paginasBySubop = data.paginasBySubop || {};
           for (var key in data) {
             if (!data.hasOwnProperty(key)) continue;
-            if (key === 'rows' || key === 'pessoas' || key === 'opsByPessoa' || key === 'paginasByOp') continue;
+            if (key === 'rows' || key === 'pessoas' || key === 'opsByPessoa' || key === 'subopsByOp' || key === 'paginasBySubop') continue;
             CFG[key] = data[key];
           }
           fillPessoa(CFG.pessoas || []);
@@ -1235,8 +1247,19 @@ function todayIso(){
         updateCustomSelectSummary('f-operacao', FILTRO_OPERACAO);
         if (!ops.length) FILTRO_OPERACAO.selected = '';
       }
+      function applySuboperacoes(pessoa, operacao){
+        var key = pessoa + '||' + operacao;
+        var subops = (CFG.subopsByOp && operacao) ? (CFG.subopsByOp[key] || []) : [];
+        FILTRO_SUBOPERACAO.options = (subops || []).slice();
+        if (FILTRO_SUBOPERACAO.selected && !FILTRO_SUBOPERACAO.options.includes(FILTRO_SUBOPERACAO.selected)) {
+          FILTRO_SUBOPERACAO.selected = '';
+        }
+        setCustomSelectDisabled('f-suboperacao', FILTRO_SUBOPERACAO, !subops.length);
+        updateCustomSelectSummary('f-suboperacao', FILTRO_SUBOPERACAO);
+      }
 
       applyOperacoes(FILTRO_PESSOA.selected);
+      applySuboperacoes(FILTRO_PESSOA.selected, FILTRO_OPERACAO.selected);
 
       var coordSel = byId('coord-pessoa');
       if (coordSel) {
@@ -1302,6 +1325,7 @@ function todayIso(){
         // Fechar outros painéis abertos
         if (FILTRO_PESSOA.open && idPrefix !== 'f-pessoa') { FILTRO_PESSOA.open = false; byId('f-pessoa-panel').classList.add('hidden'); }
         if (FILTRO_OPERACAO.open && idPrefix !== 'f-operacao') { FILTRO_OPERACAO.open = false; byId('f-operacao-panel').classList.add('hidden'); }
+        if (FILTRO_SUBOPERACAO.open && idPrefix !== 'f-suboperacao') { FILTRO_SUBOPERACAO.open = false; byId('f-suboperacao-panel').classList.add('hidden'); }
         if (PQ.open && idPrefix !== 'pq') { PQ.open = false; byId('pq-panel').classList.add('hidden'); }
 
         model.open = true;
@@ -1487,6 +1511,7 @@ function todayIso(){
         // Fechar outros painéis abertos
         if (FILTRO_PESSOA.open) { FILTRO_PESSOA.open = false; byId('f-pessoa-panel').classList.add('hidden'); }
         if (FILTRO_OPERACAO.open) { FILTRO_OPERACAO.open = false; byId('f-operacao-panel').classList.add('hidden'); }
+        if (FILTRO_SUBOPERACAO.open) { FILTRO_SUBOPERACAO.open = false; byId('f-suboperacao-panel').classList.add('hidden'); }
         
         PQ.open = true;
         renderPQOptions();
@@ -1533,6 +1558,14 @@ function todayIso(){
             pnl = byId('f-operacao-panel');
             if (!((tgl && tgl.contains(evt.target)) || (pnl && pnl.contains(evt.target)))) {
                 FILTRO_OPERACAO.open = false;
+                if (pnl) pnl.classList.add('hidden');
+            }
+        }
+        if (FILTRO_SUBOPERACAO.open) {
+            tgl = byId('f-suboperacao-toggle');
+            pnl = byId('f-suboperacao-panel');
+            if (!((tgl && tgl.contains(evt.target)) || (pnl && pnl.contains(evt.target)))) {
+                FILTRO_SUBOPERACAO.open = false;
                 if (pnl) pnl.classList.add('hidden');
             }
         }
@@ -1664,13 +1697,14 @@ function todayIso(){
         var params = {
           pessoa: FILTRO_PESSOA.selected,
           operacao: FILTRO_OPERACAO.selected,
+          suboperacao: FILTRO_SUBOPERACAO.selected,
           paginasSelecionadas: PQ.selected.slice(),
           startDate: startValue || '',
           endDate: endValue || '',
           granularity: byId('f-gran').value || 'hour'
         };
-        if (!params.pessoa || !params.operacao || !params.paginasSelecionadas.length) { 
-            showToast('Selecione Pessoa, Operação e pelo menos uma Página de Queda.', 'error'); 
+        if (!params.pessoa || !params.operacao || !params.suboperacao || !params.paginasSelecionadas.length) { 
+            showToast('Selecione Pessoa, Operação, Suboperação e pelo menos uma Página de Queda.', 'error'); 
             return; 
         }
         showLoading('Carregando dados do dashboard...');
@@ -2897,6 +2931,7 @@ function todayIso(){
         byId('cfg-id').value = item.id;
         byId('cfg-pessoa').value = item.pessoa;
         byId('cfg-operacao').value = item.operacao;
+        byId('cfg-suboperacao').value = item.suboperacao || '';
         byId('cfg-pagina').value = item.pagina;
         byId('cfg-parte').value = item.parte;
         byId('cfg-canal').value = item.canal;
@@ -2925,11 +2960,11 @@ function todayIso(){
     }
 
     function wireCfgForm(){
-      byId('btn-limpar').onclick=function(){byId('cfg-id').value='';byId('cfg-pessoa').value='';byId('cfg-operacao').value='';byId('cfg-pagina').value='';byId('cfg-parte').value='P1';byId('cfg-canal').value='';byId('cfg-urls').value=''; byId('cfg-rede').value=''; byId('cfg-moeda').value='USD';};
+      byId('btn-limpar').onclick=function(){byId('cfg-id').value='';byId('cfg-pessoa').value='';byId('cfg-operacao').value='';byId('cfg-suboperacao').value='';byId('cfg-pagina').value='';byId('cfg-parte').value='P1';byId('cfg-canal').value='';byId('cfg-urls').value=''; byId('cfg-rede').value=''; byId('cfg-moeda').value='USD';};
       byId('form-cfg').onsubmit = function(e){
         e.preventDefault();
-        var payload={id:byId('cfg-id').value,pessoa:(byId('cfg-pessoa').value||'').trim(),operacao:(byId('cfg-operacao').value||'').trim(),pagina:(byId('cfg-pagina').value||'').trim(),parte:(byId('cfg-parte').value||'').trim(),canal:(byId('cfg-canal').value||'').trim(),urls:(byId('cfg-urls').value||'').trim(),rede:(byId('cfg-rede').value||'').trim(),moeda:(byId('cfg-moeda').value||'USD').trim().toUpperCase()};
-        if(!payload.pessoa||!payload.operacao||!payload.pagina||!payload.parte){ showToast('Preencha Pessoa, Operação, Página e Parte.', 'error'); return; }
+        var payload={id:byId('cfg-id').value,pessoa:(byId('cfg-pessoa').value||'').trim(),operacao:(byId('cfg-operacao').value||'').trim(),suboperacao:(byId('cfg-suboperacao').value||'').trim(),pagina:(byId('cfg-pagina').value||'').trim(),parte:(byId('cfg-parte').value||'').trim(),canal:(byId('cfg-canal').value||'').trim(),urls:(byId('cfg-urls').value||'').trim(),rede:(byId('cfg-rede').value||'').trim(),moeda:(byId('cfg-moeda').value||'USD').trim().toUpperCase()};
+        if(!payload.pessoa||!payload.operacao||!payload.suboperacao||!payload.pagina||!payload.parte){ showToast('Preencha Pessoa, Operação, Suboperação, Página e Parte.', 'error'); return; }
 
         showLoading('Salvando configuração...');
         google.script.run
@@ -2961,13 +2996,27 @@ function todayIso(){
             FILTRO_OPERACAO.searchTerm = '';
             setCustomSelectDisabled('f-operacao', FILTRO_OPERACAO, !ops.length);
             updateCustomSelectSummary('f-operacao', FILTRO_OPERACAO);
+            FILTRO_SUBOPERACAO.options = [];
+            FILTRO_SUBOPERACAO.selected = '';
+            FILTRO_SUBOPERACAO.searchTerm = '';
+            setCustomSelectDisabled('f-suboperacao', FILTRO_SUBOPERACAO, true);
+            updateCustomSelectSummary('f-suboperacao', FILTRO_SUBOPERACAO);
             resetPQ(); // Reseta páginas
         });
         
         wireCustomSelect('f-operacao', FILTRO_OPERACAO, function(operacao) {
-            // Callback "onchange" para Operação
             var key = FILTRO_PESSOA.selected + '||' + operacao;
-            var pags = (CFG.paginasByOp && CFG.paginasByOp[key]) ? CFG.paginasByOp[key] : [];
+            var subops = (CFG.subopsByOp && CFG.subopsByOp[key]) ? CFG.subopsByOp[key] : [];
+            FILTRO_SUBOPERACAO.options = (subops || []).slice();
+            FILTRO_SUBOPERACAO.selected = '';
+            FILTRO_SUBOPERACAO.searchTerm = '';
+            setCustomSelectDisabled('f-suboperacao', FILTRO_SUBOPERACAO, !subops.length);
+            updateCustomSelectSummary('f-suboperacao', FILTRO_SUBOPERACAO);
+            resetPQ();
+        });
+        wireCustomSelect('f-suboperacao', FILTRO_SUBOPERACAO, function(suboperacao) {
+            var key = FILTRO_PESSOA.selected + '||' + FILTRO_OPERACAO.selected + '||' + suboperacao;
+            var pags = (CFG.paginasBySubop && CFG.paginasBySubop[key]) ? CFG.paginasBySubop[key] : [];
             setPQOptions(pags);
         });
         // FIM ADIÇÃO

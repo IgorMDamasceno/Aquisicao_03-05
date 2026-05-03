@@ -21,7 +21,7 @@ const HEADER_MAP = {
   cpc: 'CPC',
   viewability: 'Viewability',
 };
-const CONFIG_HEADERS = ['ID','Pessoa','Operação','PaginaQueda','Parte','Canal','URLs (;)','Rede','Moeda'];
+const CONFIG_HEADERS = ['ID','Pessoa','Operação','Suboperação','PaginaQueda','Parte','Canal','URLs (;)','Rede','Moeda'];
 
 // ============================================================
 // CONFIGURAÇÃO DE PALAVRAS-CHAVE DOS BLOCOS DE ANÚNCIO
@@ -199,6 +199,7 @@ function getConfig() {
         id: String(r[idx['ID']] || ''),
         pessoa: pessoa,
         operacao: String(r[idx['Operação']] || '').trim(),
+        suboperacao: String(r[idx['Suboperação']] || '').trim(),
         pagina: String(r[idx['PaginaQueda']] || '').trim(),
         parte: String(r[idx['Parte']] || '').trim(),
         canal: String(r[idx['Canal']] || '').trim(),
@@ -212,22 +213,27 @@ function getConfig() {
       });
     }
   });
-  var pessoasSet = {}, opsByPessoa = {}, paginasByOp = {};
+  var pessoasSet = {}, opsByPessoa = {}, subopsByOp = {}, paginasBySubop = {};
   data.forEach(function(d) {
     pessoasSet[d.pessoa] = true;
     if (!opsByPessoa[d.pessoa]) opsByPessoa[d.pessoa] = {};
     opsByPessoa[d.pessoa][d.operacao] = true;
-    var key = d.pessoa + '||' + d.operacao;
-    if (!paginasByOp[key]) paginasByOp[key] = {};
-    paginasByOp[key][d.pagina] = true;
+    var opKey = d.pessoa + '||' + d.operacao;
+    if (!subopsByOp[opKey]) subopsByOp[opKey] = {};
+    if (d.suboperacao) subopsByOp[opKey][d.suboperacao] = true;
+    var subopKey = d.pessoa + '||' + d.operacao + '||' + d.suboperacao;
+    if (!paginasBySubop[subopKey]) paginasBySubop[subopKey] = {};
+    paginasBySubop[subopKey][d.pagina] = true;
   });
   var pessoas = Object.keys(pessoasSet).sort();
   var opsByPessoaObj = {};
   Object.keys(opsByPessoa).forEach(p => { opsByPessoaObj[p] = Object.keys(opsByPessoa[p]).sort(); });
-  var paginasByOpObj = {};
-  Object.keys(paginasByOp).forEach(k => { paginasByOpObj[k] = Object.keys(paginasByOp[k]).sort(); });
+  var subopsByOpObj = {};
+  Object.keys(subopsByOp).forEach(k => { subopsByOpObj[k] = Object.keys(subopsByOp[k]).sort(); });
+  var paginasBySubopObj = {};
+  Object.keys(paginasBySubop).forEach(k => { paginasBySubopObj[k] = Object.keys(paginasBySubop[k]).sort(); });
 
-  return { rows: data, pessoas: pessoas, opsByPessoa: opsByPessoaObj, paginasByOp: paginasByOpObj };
+  return { rows: data, pessoas: pessoas, opsByPessoa: opsByPessoaObj, subopsByOp: subopsByOpObj, paginasBySubop: paginasBySubopObj };
 }
 
 function upsertConfig(row) {
@@ -239,14 +245,14 @@ function upsertConfig(row) {
   if (row.id) {
     for (var i = 1; i < range.length; i++) {
       if (String(range[i][idx['ID']] || '').trim() === String(row.id).trim()) {
-        var values = [ row.id, row.pessoa, row.operacao, row.pagina, row.parte, row.canal, row.urls, row.rede, row.moeda || 'USD' ];
+        var values = [ row.id, row.pessoa, row.operacao, row.suboperacao, row.pagina, row.parte, row.canal, row.urls, row.rede, row.moeda || 'USD' ];
         sh.getRange(i + 1, 1, 1, values.length).setValues([values]);
         return { ok: true };
       }
     }
   }
 
-  var newValues = [ Utilities.getUuid(), row.pessoa, row.operacao, row.pagina, row.parte, row.canal, row.urls, row.rede, row.moeda || 'USD' ];
+  var newValues = [ Utilities.getUuid(), row.pessoa, row.operacao, row.suboperacao, row.pagina, row.parte, row.canal, row.urls, row.rede, row.moeda || 'USD' ];
   sh.appendRow(newValues);
   return { ok: true };
 }
@@ -394,11 +400,11 @@ function upsertPricingRulesIgoal(rules) {
 /* ============= DASHBOARD ============= */
 function getDashboardData(params) {
   params = params || {};
-  var pessoa = params.pessoa, operacao = params.operacao, paginasSelecionadas = params.paginasSelecionadas || [],
+  var pessoa = params.pessoa, operacao = params.operacao, suboperacao = params.suboperacao, paginasSelecionadas = params.paginasSelecionadas || [],
       startDate = params.startDate, endDate = params.endDate, granularity = params.granularity || 'hour';
   var gran = (granularity === 'day' || granularity === 'last6h' || granularity === 'last3h') ? granularity : 'hour';
   var emptyReturn = { pages: [], compare: [], compareBlocks: [], granularity: gran, seriesChart: [], labelsChart: [], seriesChartByBlock: {}, pricingRulesAdSeleto: [], pricingRulesIgoal: [] };
-  if (!pessoa || !operacao || !paginasSelecionadas.length) return emptyReturn;
+  if (!pessoa || !operacao || !suboperacao || !paginasSelecionadas.length) return emptyReturn;
 
 if (!startDate && !endDate) {
     var today = todayIso_();
@@ -410,7 +416,7 @@ if (!startDate && !endDate) {
     startDate = endDate;
   }
 
-  var cfgAll = getConfig().rows.filter(r => r.pessoa === pessoa && r.operacao === operacao);
+  var cfgAll = getConfig().rows.filter(r => r.pessoa === pessoa && r.operacao === operacao && r.suboperacao === suboperacao);
   var pageIndex = {};
   cfgAll.forEach(r => {
     if (paginasSelecionadas.includes(r.pagina)) {
