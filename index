@@ -600,8 +600,8 @@ function todayIso(){
         }
         if (COORD.loading) return;
         COORD.loading = true;
-        setCoordinationLoading('Carregando visão de coordenação...');
-        showLoading('Carregando visão de coordenação...');
+        setCoordinationLoading('Carregando visão Geral...');
+        showLoading('Carregando visão Geral...');
         google.script.run
             .withSuccessHandler(function(res){
                 COORD.loading = false;
@@ -866,6 +866,7 @@ function todayIso(){
                     + '<td class="py-2 px-2 text-right">'+num(metrics.requests || 0, 0)+'</td>'
                     + '<td class="py-2 px-2 text-right">'+pct(metrics.coverage || 0, 2)+'</td>'
                     + '<td class="py-2 px-2 text-right">'+money(metrics.cpc || 0, 3)+'</td>'
+                    + '<td class="py-2 px-2 text-right">'+((typeof metrics.cpcCorrigido === 'number') ? money(metrics.cpcCorrigido, 3) : '-')+'</td>'
                     + '</tr>';
             }).join('');
             var head = '<thead class="text-slate-400"><tr>'
@@ -878,6 +879,7 @@ function todayIso(){
                 + '<th class="text-right py-2 px-2 cursor-pointer" onclick="sortByCoordBlockHeader(\'requests\')">Solicitações'+coordBlockSortIndicator('requests')+'</th>'
                 + '<th class="text-right py-2 px-2 cursor-pointer" onclick="sortByCoordBlockHeader(\'coverage\')">Cobertura'+coordBlockSortIndicator('coverage')+'</th>'
                 + '<th class="text-right py-2 px-2 cursor-pointer" onclick="sortByCoordBlockHeader(\'cpc\')">CPC'+coordBlockSortIndicator('cpc')+'</th>'
+                + '<th class="text-right py-2 px-2">CPC Corrigido</th>'
                 + '</tr></thead>';
             return '<div class="overflow-auto"><table class="w-full text-sm">'+head+'<tbody>'+rows+'</tbody></table></div>';
         }
