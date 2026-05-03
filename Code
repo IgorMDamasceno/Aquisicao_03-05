@@ -712,8 +712,10 @@ if (!startDate && !endDate) {
   var operationsMap = {};
   cfgRows.forEach(function(row){
     if (!operationsMap[row.operacao]) operationsMap[row.operacao] = { operacao: row.operacao, pages: {} };
-    if (!operationsMap[row.operacao].pages[row.pagina]) operationsMap[row.operacao].pages[row.pagina] = {};
-    operationsMap[row.operacao].pages[row.pagina][row.parte] = {
+    if (!operationsMap[row.operacao].suboperacoes) operationsMap[row.operacao].suboperacoes = {};
+    if (!operationsMap[row.operacao].suboperacoes[row.suboperacao]) operationsMap[row.operacao].suboperacoes[row.suboperacao] = { suboperacao: row.suboperacao, pages: {} };
+    if (!operationsMap[row.operacao].suboperacoes[row.suboperacao].pages[row.pagina]) operationsMap[row.operacao].suboperacoes[row.suboperacao].pages[row.pagina] = {};
+    operationsMap[row.operacao].suboperacoes[row.suboperacao].pages[row.pagina][row.parte] = {
       canal: row.canal,
       urls: row.urls || [],
       rede: row.rede,
@@ -724,6 +726,7 @@ if (!startDate && !endDate) {
   var entries = cfgRows.map(function(row){
     return {
       operacao: row.operacao,
+      suboperacao: row.suboperacao,
       pagina: row.pagina,
       parte: row.parte,
       canal: row.canal,
@@ -975,7 +978,7 @@ if (!startDate && !endDate) {
       var adunitLower = adunit.toLowerCase();
 
       // Agrega tudo por página (para o Total da Página)
-      var pageKey = entry.operacao + '||' + entry.pagina;
+      var pageKey = entry.operacao + '||' + entry.suboperacao + '||' + entry.pagina;
       if (!pageAgg[pageKey]) pageAgg[pageKey] = blankAgg_();
       pushRow_(pageAgg[pageKey], row);
 
@@ -992,7 +995,7 @@ if (!startDate && !endDate) {
       // Agrega por bloco classificado
       var classification = classifyBlock_(adunit, entry.parte);
       if (!classification) return;
-      var baseKey = entry.operacao + '||' + entry.pagina + '||' + classification.label;
+      var baseKey = entry.operacao + '||' + entry.suboperacao + '||' + entry.pagina + '||' + classification.label;
       if (!blockAgg[baseKey]) blockAgg[baseKey] = blankAgg_();
       pushRow_(blockAgg[baseKey], row);
       var hourKey = baseKey + '||' + ms;
@@ -1006,8 +1009,9 @@ if (!startDate && !endDate) {
     Object.keys(blockAgg).forEach(function(key){
       if (key.indexOf(opName + '||') !== 0) return;
       var parts = key.split('||');
-      var pageName = parts[1];
-      var label = parts[2];
+      var subopName = parts[1];
+      var pageName = parts[2];
+      var label = parts[3];
       var agg = blockAgg[key];
       var metrics = finalizeAgg_(agg);
       var suggestionBasis = buildSuggestionBasis_(key, blockHourAgg);
@@ -1015,18 +1019,19 @@ if (!startDate && !endDate) {
       if (label.indexOf('(P1)') !== -1) parte = 'P1';
       else if (label.indexOf('(P2)') !== -1) parte = 'P2';
       else if (label.indexOf('(Quiz)') !== -1) parte = 'Quiz';
-      blocks.push({ page: pageName, label: label, parte: parte, metrics: metrics, suggestionBasis: suggestionBasis });
+      blocks.push({ suboperacao: subopName, page: pageName, label: label, parte: parte, metrics: metrics, suggestionBasis: suggestionBasis });
     });
     blocks.sort(function(a,b){
       if (a.page !== b.page) return String(a.page || '').localeCompare(String(b.page || ''));
       return String(a.label || '').localeCompare(String(b.label || ''));
     });
 
-    // Monta o Comparativo — Total da Página para esta operação
-    var compareByPage = [];
-    var pagesInOp = Object.keys(operationsMap[opName].pages);
-    pagesInOp.forEach(function(pageName){
-      var pageKey = opName + '||' + pageName;
+    var subops = Object.keys(operationsMap[opName].suboperacoes || {}).map(function(subName){
+      var compareByPage = [];
+      var subBlocks = blocks.filter(function(b){ return b.suboperacao === subName; });
+      var pagesInSubop = Object.keys((operationsMap[opName].suboperacoes[subName] || {}).pages || {});
+      pagesInSubop.forEach(function(pageName){
+      var pageKey = opName + '||' + subName + '||' + pageName;
       var pageMet = finalizeAgg_(pageAgg[pageKey] || blankAgg_());
       var p1p2Raw = p1p2Agg[pageKey] || blankAgg_();
       var reqInt = p1InterstReqMap[pageKey] || 0;
@@ -1037,7 +1042,7 @@ if (!startDate && !endDate) {
       var cpcP1P2 = clkP1P2 > 0 ? revP1P2 / clkP1P2 : 0;
       var interactionRateCapped = Math.max(0, Math.min(interactionRate, 100));
       var cpcCorrigido = cpcP1P2 * (interactionRateCapped / 100);
-      compareByPage.push({
+        compareByPage.push({
         page: pageName,
         revenue: pageMet.revenue,
         impressions: pageMet.impressions,
@@ -1055,10 +1060,11 @@ if (!startDate && !endDate) {
         revenueP1P2: revP1P2,
         clicksP1P2: clkP1P2
       });
+      });
+      compareByPage.sort(function(a, b){ return b.revenue - a.revenue; });
+      return { suboperacao: subName, blocks: subBlocks, compareByPage: compareByPage };
     });
-    compareByPage.sort(function(a, b){ return b.revenue - a.revenue; });
-
-    return { operacao: opName, blocks: blocks, compareByPage: compareByPage };
+    return { operacao: opName, suboperacoes: subops };
   });
 
   return { operations: operations };

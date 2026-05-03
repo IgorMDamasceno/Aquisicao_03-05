@@ -616,13 +616,15 @@ function todayIso(){
             .getCoordinationData({ pessoa: pessoa, agrupamento: agrupamento });
     }
 
-    function updateCoordinationOperation(opName){
+    function updateCoordinationOperation(opName, subopName){
         if (!opName) return;
         var op = COORD.operationMap[opName];
         if (!op) return;
-        var container = byId('coord-table-' + slugifyCoord(opName));
+        var key = subopName ? (opName + '--' + subopName) : opName;
+        var container = byId('coord-table-' + slugifyCoord(key));
         if (!container) return;
-        container.innerHTML = buildCoordinationTable(op, COORD.cpcTargets[opName]);
+        var scope = subopName ? ((op.suboperacoes||[]).find(function(s){ return s.suboperacao===subopName; }) || {}) : op;
+        container.innerHTML = buildCoordinationTable(scope);
     }
 
     // MODIFICADO: renderCoordination - removidos os controles de ordenação
@@ -660,54 +662,30 @@ function todayIso(){
             var card = document.createElement('div');
             card.className = 'card rounded-2xl p-6 space-y-4';
 
-            // Cabeçalho: nome da operação + campo CPC Alvo
             var header = document.createElement('div');
-            header.className = 'flex flex-wrap items-center justify-between gap-3';
+            header.className = 'flex flex-wrap items-center justify-between gap-3 border-b border-indigo-400/30 pb-3';
             var title = document.createElement('div');
-            title.className = 'text-lg font-bold text-slate-100';
+            title.className = 'text-lg font-bold text-indigo-200';
             title.textContent = opName;
             header.appendChild(title);
-
-            var inputWrap = document.createElement('label');
-            inputWrap.className = 'flex items-center gap-2 text-sm text-slate-300';
-            inputWrap.innerHTML = '<span>CPC Alvo</span>';
-            var input = document.createElement('input');
-            input.type = 'number';
-            input.step = '0.01';
-            input.placeholder = '0.00';
-            input.className = 'pill rounded-lg px-3 py-2 text-sm w-28';
-            if (COORD.cpcTargets.hasOwnProperty(opName) && COORD.cpcTargets[opName] !== undefined) {
-                var val = COORD.cpcTargets[opName];
-                input.value = (val === null || val === undefined) ? '' : val;
-            }
-            input.dataset.operation = opName;
-            input.addEventListener('input', function(){
-                var name = this.dataset.operation;
-                if (!name) return;
-                var v = parseFloat(this.value);
-                if (isNaN(v)) {
-                    delete COORD.cpcTargets[name];
-                } else {
-                    COORD.cpcTargets[name] = v;
-                }
-                updateCoordinationOperation(name);
-            });
-            input.addEventListener('blur', function(){ updateCoordinationOperation(this.dataset.operation); });
-            inputWrap.appendChild(input);
-            header.appendChild(inputWrap);
             card.appendChild(header);
-
-            // Seção 1: Comparativo — Total da Página
-            var totalPageSection = document.createElement('div');
-            totalPageSection.innerHTML = buildCoordTotalPageHtml(op.compareByPage || []);
-            card.appendChild(totalPageSection);
-
-            // Seção 2: Comparativo por Blocos (com sugestões)
-            var tableContainer = document.createElement('div');
-            var slug = slugifyCoord(opName);
-            tableContainer.id = 'coord-table-' + slug;
-            tableContainer.innerHTML = buildCoordinationTable(op, COORD.cpcTargets[opName]);
-            card.appendChild(tableContainer);
+            (op.suboperacoes || []).forEach(function(sub){
+              var subWrap = document.createElement('div');
+              subWrap.className = 'rounded-xl border-2 border-teal-500/30 bg-slate-900/50 p-4 space-y-3';
+              var subHeader = document.createElement('div');
+              subHeader.className = 'sticky top-0 z-10 bg-slate-900/90 backdrop-blur px-2 py-1 rounded text-teal-200 font-semibold';
+              subHeader.textContent = 'Suboperação: ' + (sub.suboperacao || '—');
+              subWrap.appendChild(subHeader);
+              var totalPageSection = document.createElement('div');
+              totalPageSection.innerHTML = buildCoordTotalPageHtml(sub.compareByPage || []);
+              subWrap.appendChild(totalPageSection);
+              var tableContainer = document.createElement('div');
+              var slug = slugifyCoord(opName + '--' + (sub.suboperacao || ''));
+              tableContainer.id = 'coord-table-' + slug;
+              tableContainer.innerHTML = buildCoordinationTable(sub);
+              subWrap.appendChild(tableContainer);
+              card.appendChild(subWrap);
+            });
 
             frag.appendChild(card);
         });
@@ -842,7 +820,7 @@ function todayIso(){
     }
 
     // MODIFICADO: buildCoordinationTable - cabeçalhos da tabela agora são clicáveis
-    function buildCoordinationTable(op, targetValue){
+    function buildCoordinationTable(op){
         var blocks = (op && op.blocks) ? op.blocks.slice() : [];
         if (!blocks.length) {
             return '<div class="card rounded-xl p-4 border border-slate-700/60 bg-slate-900/40 text-sm text-slate-300">Sem dados disponíveis para esta operação nas últimas horas.</div>';
@@ -857,8 +835,6 @@ function todayIso(){
         blocks.forEach(function(block){
             basisMap[String(block.page||'')+'||'+String(block.label||'')] = block.suggestionBasis || {};
         });
-        var target = parseFloat(targetValue);
-        if (!isFinite(target)) target = NaN;
 
         var grouped = { Quiz: {}, P1: {}, P2: {} };
         blocks.forEach(function(block){
@@ -870,7 +846,7 @@ function todayIso(){
             grouped[part][label].push({
                 page: block.page || '-',
                 metrics: metrics,
-                suggestion: getCoordinationSuggestion(block, target, basisMap)
+                suggestion: getCoordinationSuggestion(block, NaN, basisMap)
             });
         });
 
@@ -895,7 +871,6 @@ function todayIso(){
                     + '<td class="py-2 px-2 text-right">'+num(metrics.requests || 0, 0)+'</td>'
                     + '<td class="py-2 px-2 text-right">'+pct(metrics.coverage || 0, 2)+'</td>'
                     + '<td class="py-2 px-2 text-right">'+money(metrics.cpc || 0, 3)+'</td>'
-                    + '<td class="py-2 px-2 align-top">'+renderCoordinationSuggestionCell(item.suggestion)+'</td>'
                     + '</tr>';
             }).join('');
             var head = '<thead class="text-slate-400"><tr>'
@@ -908,7 +883,6 @@ function todayIso(){
                 + '<th class="text-right py-2 px-2 cursor-pointer" onclick="sortByCoordBlockHeader(\'requests\')">Solicitações'+coordBlockSortIndicator('requests')+'</th>'
                 + '<th class="text-right py-2 px-2 cursor-pointer" onclick="sortByCoordBlockHeader(\'coverage\')">Cobertura'+coordBlockSortIndicator('coverage')+'</th>'
                 + '<th class="text-right py-2 px-2 cursor-pointer" onclick="sortByCoordBlockHeader(\'cpc\')">CPC'+coordBlockSortIndicator('cpc')+'</th>'
-                + '<th class="text-left py-2 px-2">Sugestão de precificação</th>'
                 + '</tr></thead>';
             return '<div class="overflow-auto"><table class="w-full text-sm">'+head+'<tbody>'+rows+'</tbody></table></div>';
         }
