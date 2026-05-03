@@ -845,8 +845,9 @@ function todayIso(){
             });
         });
 
-        function tableFor(list){
+        function tableFor(list, label){
             if (!list || !list.length) return '';
+            var isOfferwall = String(label || '').toLowerCase().includes('offerwall');
             var sorted = sortBlockEntries(list, COORD_BLOCK_SORT);
             // Filtra linhas zeradas (sem receita, impressões e cliques)
             sorted = sorted.filter(function(item){
@@ -854,8 +855,18 @@ function todayIso(){
                 return (m.revenue || 0) > 0 || (m.impressions || 0) > 0 || (m.clicks || 0) > 0;
             });
             if (!sorted.length) return '';
+            function calcCpcCorrigido(metrics){
+                var revenue = Number(metrics.revenue || 0);
+                var requests = Number(metrics.requests || 0);
+                var coverageRate = Number(metrics.coverage || 0) / 100;
+                var impressions = Number(metrics.impressions || 0);
+                var clicks = Number(metrics.clicks || 0);
+                var correctedClicks = ((requests * coverageRate) - impressions) + clicks;
+                return correctedClicks > 0 ? (revenue / correctedClicks) : 0;
+            }
             var rows = sorted.map(function(item){
                 var metrics = item.metrics || {};
+                var cpcCorrigidoCell = isOfferwall ? ('<td class="py-2 px-2 text-right">'+money(calcCpcCorrigido(metrics), 3)+'</td>') : '';
                 return '<tr class="border-t border-slate-700/60 hover:bg-slate-800/50">'
                     + '<td class="py-2 px-2 text-slate-300">'+escapeHtml(item.page || '-')+'</td>'
                     + '<td class="py-2 px-2 text-right">'+money(metrics.revenue || 0)+'</td>'
@@ -866,7 +877,7 @@ function todayIso(){
                     + '<td class="py-2 px-2 text-right">'+num(metrics.requests || 0, 0)+'</td>'
                     + '<td class="py-2 px-2 text-right">'+pct(metrics.coverage || 0, 2)+'</td>'
                     + '<td class="py-2 px-2 text-right">'+money(metrics.cpc || 0, 3)+'</td>'
-                    + '<td class="py-2 px-2 text-right">'+((typeof metrics.cpcCorrigido === 'number') ? money(metrics.cpcCorrigido, 3) : '-')+'</td>'
+                    + cpcCorrigidoCell
                     + '</tr>';
             }).join('');
             var head = '<thead class="text-slate-400"><tr>'
@@ -879,7 +890,7 @@ function todayIso(){
                 + '<th class="text-right py-2 px-2 cursor-pointer" onclick="sortByCoordBlockHeader(\'requests\')">Solicitações'+coordBlockSortIndicator('requests')+'</th>'
                 + '<th class="text-right py-2 px-2 cursor-pointer" onclick="sortByCoordBlockHeader(\'coverage\')">Cobertura'+coordBlockSortIndicator('coverage')+'</th>'
                 + '<th class="text-right py-2 px-2 cursor-pointer" onclick="sortByCoordBlockHeader(\'cpc\')">CPC'+coordBlockSortIndicator('cpc')+'</th>'
-                + '<th class="text-right py-2 px-2">CPC Corrigido</th>'
+                + (isOfferwall ? '<th class="text-right py-2 px-2">CPC Corrigido</th>' : '')
                 + '</tr></thead>';
             return '<div class="overflow-auto"><table class="w-full text-sm">'+head+'<tbody>'+rows+'</tbody></table></div>';
         }
