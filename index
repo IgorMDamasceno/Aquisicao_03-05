@@ -589,12 +589,12 @@ function todayIso(){
     }
 
     function loadCoordinationData(forceReload){
-        if (!CoordAccess.granted) return;
         var pessoaSel = byId('coord-pessoa');
         var pessoa = pessoaSel ? pessoaSel.value : '';
         var agrupSel = byId('coord-agrupamento');
         var agrupamento = agrupSel ? agrupSel.value : 'day';
         if (!pessoa) {
+            showToast('Selecione uma Pessoa e clique em "Atualizar visão".', 'info');
             renderCoordination({ operations: [], message: 'Selecione uma pessoa para visualizar os dados.' });
             return;
         }
@@ -631,10 +631,6 @@ function todayIso(){
     function renderCoordination(res){
         var container = byId('coord-results');
         if (!container) return;
-        if (!CoordAccess.granted) {
-            container.innerHTML = '<div class="card rounded-2xl p-6 text-slate-200 border border-slate-700/60 bg-slate-900/40">Área restrita. Informe a senha para visualizar.</div>';
-            return;
-        }
         if (res && res.error) {
             container.innerHTML = '<div class="card rounded-2xl p-6 border border-rose-500/40 bg-rose-900/20 text-rose-100">'+escapeHtml(res.error)+'</div>';
             return;
@@ -695,7 +691,6 @@ function todayIso(){
     }
 
     function rerenderCoordination(){
-        if (!CoordAccess.granted) return;
         if (COORD.lastResponse) {
             renderCoordination(COORD.lastResponse);
         }
@@ -2987,6 +2982,13 @@ function todayIso(){
             var pags = (CFG.paginasBySubop && CFG.paginasBySubop[key]) ? CFG.paginasBySubop[key] : [];
             setPQOptions(pags);
         });
+        var coordBtn = byId('coord-btn-carregar');
+        if (coordBtn) {
+          coordBtn.onclick = function(){
+            showToast('Atualizando visão geral...', 'info');
+            loadCoordinationData(true);
+          };
+        }
         // FIM ADIÇÃO
 
         setupCfgListControls();
