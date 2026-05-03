@@ -1157,6 +1157,7 @@ function todayIso(){
       });
 
       setActiveTab('dash');
+      setupCoordinationAccess();
 
       var subAna = byId('sub-ana');
       var subComp = byId('sub-comp');
