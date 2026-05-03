@@ -76,13 +76,13 @@
           <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd" /></svg>
           Dashboard
         </button>
+        <button id="tab-coord" class="px-4 py-2 rounded-lg text-slate-300 hover:text-white flex items-center gap-2 transition-all">
+          <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a.75.75 0 01.75.75V4h1.5A2.75 2.75 0 0115 6.75v.978a2.75 2.75 0 011.636 4.305l.999.999a.75.75 0 11-1.06 1.06l-.868-.868c-.46.333-1.017.526-1.622.526h-1.5v1.25a.75.75 0 01-1.5 0V12.75H8.25v1.25a.75.75 0 01-1.5 0V12.75h-1.5A2.75 2.75 0 012.5 10V6.75A2.75 2.75 0 015.25 4h1.5V2.75A.75.75 0 017.5 2zm0 3H5.25c-.69 0-1.25.56-1.25 1.25V10c0 .69.56 1.25 1.25 1.25h9.5c.69 0 1.25-.56 1.25-1.25V6.25c0-.69-.56-1.25-1.25-1.25H10z"/></svg>
+          Visão Geral
+        </button>
         <button id="tab-conf" class="px-4 py-2 rounded-lg text-slate-300 hover:text-white flex items-center gap-2 transition-all">
           <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M5.433 13.917l1.262-3.155A4 4 0 017.58 9.42l6.92-6.918a2.121 2.121 0 013 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 01-.65-.65z" /><path d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0010 3H4.75A2.75 2.75 0 002 5.75v9.5A2.75 2.75 0 004.75 18h9.5A2.75 2.75 0 0017 15.25V10a.75.75 0 00-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5z" /></svg>
           Configurar
-        </button>
-        <button id="tab-coord" class="px-4 py-2 rounded-lg text-slate-300 hover:text-white flex items-center gap-2 transition-all">
-          <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a.75.75 0 01.75.75V4h1.5A2.75 2.75 0 0115 6.75v.978a2.75 2.75 0 011.636 4.305l.999.999a.75.75 0 11-1.06 1.06l-.868-.868c-.46.333-1.017.526-1.622.526h-1.5v1.25a.75.75 0 01-1.5 0V12.75H8.25v1.25a.75.75 0 01-1.5 0V12.75h-1.5A2.75 2.75 0 012.5 10V6.75A2.75 2.75 0 015.25 4h1.5V2.75A.75.75 0 017.5 2zm0 3H5.25c-.69 0-1.25.56-1.25 1.25V10c0 .69.56 1.25 1.25 1.25h9.5c.69 0 1.25-.56 1.25-1.25V6.25c0-.69-.56-1.25-1.25-1.25H10z"/></svg>
-          Coordenação
         </button>
       </div>
     </header>
@@ -93,9 +93,9 @@
           <svg class="w-6 h-6 text-sky-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.572a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" /></svg>
           Filtros
         </h2>
-        <div class="grid sm:grid-cols-2 lg:grid-cols-6 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-slate-400 mb-1">Pessoa</label>
+        <div class="grid grid-cols-12 gap-3 items-end">
+          <div class="col-span-2">
+            <label class="block text-sm font-medium text-slate-400 mb-1">Pessoa <span class="text-rose-400">*</span></label>
             <div id="f-pessoa-select" class="relative">
               <button id="f-pessoa-toggle" type="button" class="w-full pill rounded-lg px-3 py-2 text-left text-sm" aria-haspopup="true" aria-expanded="false">
                 <span id="f-pessoa-summary" class="text-slate-300">— selecione —</span>
@@ -103,8 +103,8 @@
               <div id="f-pessoa-panel" class="hidden card rounded-xl p-3 z-50 flex flex-col shadow-2xl max-h-80"></div>
             </div>
           </div>
-          <div>
-            <label class="block text-sm font-medium text-slate-400 mb-1">Operação</label>
+          <div class="col-span-2">
+            <label class="block text-sm font-medium text-slate-400 mb-1">Operação <span class="text-rose-400">*</span></label>
             <div id="f-operacao-select" class="relative">
               <button id="f-operacao-toggle" type="button" class="w-full pill rounded-lg px-3 py-2 text-left text-sm" aria-haspopup="true" aria-expanded="false" disabled>
                 <span id="f-operacao-summary" class="text-slate-300">— selecione —</span>
@@ -112,8 +112,8 @@
               <div id="f-operacao-panel" class="hidden card rounded-xl p-3 z-50 flex flex-col shadow-2xl max-h-80"></div>
             </div>
           </div>
-          <div class="lg:col-span-2">
-            <label class="block text-sm font-medium text-slate-400 mb-1">Suboperação</label>
+          <div class="col-span-2">
+            <label class="block text-sm font-medium text-slate-400 mb-1">Suboperação <span class="text-rose-400">*</span></label>
             <div id="f-suboperacao-select" class="relative">
               <button id="f-suboperacao-toggle" type="button" class="w-full pill rounded-lg px-3 py-2 text-left text-sm" aria-haspopup="true" aria-expanded="false" disabled>
                 <span id="f-suboperacao-summary" class="text-slate-300">— selecione —</span>
@@ -121,8 +121,8 @@
               <div id="f-suboperacao-panel" class="hidden card rounded-xl p-3 z-50 flex flex-col shadow-2xl max-h-80"></div>
             </div>
           </div>
-          <div class="lg:col-span-2">
-            <label class="block text-sm font-medium text-slate-400 mb-1">Páginas de Queda</label>
+          <div class="col-span-2">
+            <label class="block text-sm font-medium text-slate-400 mb-1">Páginas de Queda <span class="text-rose-400">*</span></label>
             <div id="pq-select" class="relative">
               <button id="pq-toggle" type="button" class="w-full pill rounded-lg px-3 py-2 text-left text-sm" aria-haspopup="true" aria-expanded="false">
                 <span id="pq-summary" class="text-slate-300">— selecione —</span>
@@ -130,14 +130,14 @@
               <div id="pq-panel" class="hidden card rounded-xl p-3 z-50 flex flex-col shadow-2xl max-h-80"></div>
             </div>
           </div>
-          <div>
+          <div class="col-span-2">
             <label class="block text-sm font-medium text-slate-400 mb-1">Período</label>
             <div class="grid grid-cols-2 gap-2">
               <input id="f-start" type="date" class="w-full pill rounded-lg px-3 py-2 text-sm">
               <input id="f-end" type="date" class="w-full pill rounded-lg px-3 py-2 text-sm">
             </div>
           </div>
-          <div class="grid grid-cols-2 gap-2">
+          <div class="col-span-2 grid grid-cols-2 gap-2">
               <div>
                 <label class="block text-sm font-medium text-slate-400 mb-1">Agrupar</label>
                 <select id="f-gran" class="w-full pill rounded-lg px-3 py-2 text-sm">
@@ -256,7 +256,7 @@
     <section id="view-coord" class="hidden fade-in space-y-6">
       <div class="card rounded-2xl p-6 space-y-4">
         <div class="flex items-center justify-between flex-wrap gap-3">
-          <h2 class="text-lg font-bold text-slate-100">Visão de Coordenação</h2>
+          <h2 class="text-lg font-bold text-slate-100">Visão Geral</h2>
           <span class="text-xs text-slate-400">Acesso restrito · Sugestões baseadas nas últimas 4 horas (descartando a mais recente)</span>
         </div>
         <div class="grid sm:grid-cols-2 gap-4">
@@ -570,7 +570,7 @@ function todayIso(){
         }
         var coordAgr = byId('coord-agrupamento');
         if (coordAgr) {
-            coordAgr.onchange = function(){ loadCoordinationData(); };
+            coordAgr.onchange = function(){};
         }
         var coordBtn = byId('coord-btn-carregar');
         if (coordBtn) {
@@ -598,7 +598,7 @@ function todayIso(){
             renderCoordination({ operations: [], message: 'Selecione uma pessoa para visualizar os dados.' });
             return;
         }
-        if (COORD.loading && !forceReload) return;
+        if (COORD.loading) return;
         COORD.loading = true;
         setCoordinationLoading('Carregando visão de coordenação...');
         showLoading('Carregando visão de coordenação...');
@@ -660,7 +660,7 @@ function todayIso(){
             var opName = op.operacao || 'Operação';
             COORD.operationMap[opName] = op;
             var card = document.createElement('div');
-            card.className = 'card rounded-2xl p-6 space-y-4';
+            card.className = 'rounded-2xl p-6 space-y-4 border-2 border-violet-500/40 bg-gradient-to-br from-violet-900/30 via-slate-900/70 to-indigo-900/30 shadow-2xl';
 
             var header = document.createElement('div');
             header.className = 'flex flex-wrap items-center justify-between gap-3 border-b border-indigo-400/30 pb-3';
@@ -671,9 +671,9 @@ function todayIso(){
             card.appendChild(header);
             (op.suboperacoes || []).forEach(function(sub){
               var subWrap = document.createElement('div');
-              subWrap.className = 'rounded-xl border-2 border-teal-500/30 bg-slate-900/50 p-4 space-y-3';
+              subWrap.className = 'rounded-xl border-2 border-amber-400/40 bg-gradient-to-r from-slate-900/70 via-fuchsia-900/20 to-cyan-900/20 p-4 space-y-3 shadow-lg shadow-fuchsia-900/30';
               var subHeader = document.createElement('div');
-              subHeader.className = 'sticky top-0 z-10 bg-slate-900/90 backdrop-blur px-2 py-1 rounded text-teal-200 font-semibold';
+              subHeader.className = 'sticky top-0 z-10 bg-gradient-to-r from-amber-500/20 to-fuchsia-500/20 backdrop-blur px-3 py-2 rounded-lg text-amber-100 font-bold border border-amber-300/30';
               subHeader.textContent = 'Suboperação: ' + (sub.suboperacao || '—');
               subWrap.appendChild(subHeader);
               var totalPageSection = document.createElement('div');
@@ -1106,8 +1106,8 @@ function todayIso(){
     var FILTRO_OPERACAO = { options: [], selected: '', open: false, searchTerm: '', placeholder: '— selecione —', disabled: true };
     var FILTRO_SUBOPERACAO = { options: [], selected: '', open: false, searchTerm: '', placeholder: '— selecione —', disabled: true };
     var CHART = { inst: null };
-    var COORD = { operations: [], operationMap: {}, cpcTargets: {}, loading: false, lastResponse: null };
-    var CoordAccess = { granted: false, hash: '87402fdebedf4d5bf24d2f80aca3ae0197e8837d16a9c0155f366343c1f6a4bf', fallback: 'b10d26f7', pending: null, verifying: false };
+    var COORD = { operations: [], operationMap: {}, loading: false, lastResponse: null };
+    var CoordAccess = { granted: true, hash: '87402fdebedf4d5bf24d2f80aca3ae0197e8837d16a9c0155f366343c1f6a4bf', fallback: 'b10d26f7', pending: null, verifying: false };
     var SYNC_TIMERS = {};
 
     function showToast(message, type = 'info') {
@@ -1136,11 +1136,7 @@ function todayIso(){
       };
 
       function setActiveTab(tab){
-        if (tab === 'coord' && !CoordAccess.granted) {
-          showCoordPasswordModal(function(){ setActiveTab('coord'); });
-          return;
-        }
-        Object.keys(tabMap).forEach(function(key){
+                Object.keys(tabMap).forEach(function(key){
           var cfg = tabMap[key];
           if (!cfg.button || !cfg.view) return;
           var isActive = (key === tab);
@@ -1151,9 +1147,7 @@ function todayIso(){
             cfg.button.classList.remove('bg-blue-600','text-white');
           }
         });
-        if (tab === 'coord') {
-          loadCoordinationData();
-        }
+        
       }
 
       Object.keys(tabMap).forEach(function(key){
@@ -1163,7 +1157,6 @@ function todayIso(){
       });
 
       setActiveTab('dash');
-      setupCoordinationAccess();
 
       var subAna = byId('sub-ana');
       var subComp = byId('sub-comp');
@@ -1240,7 +1233,7 @@ function todayIso(){
         var previous = coordSel.value;
         coordSel.innerHTML = '<option value="">— selecione —</option>' + (list||[]).map(function(p){return '<option>'+escapeHtml(p)+'</option>';}).join('');
         if (previous && list && list.indexOf(previous) >= 0) coordSel.value = previous;
-        coordSel.onchange = function(){ loadCoordinationData(); };
+        coordSel.onchange = function(){};
       }
     }
     
