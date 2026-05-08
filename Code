@@ -21,7 +21,7 @@ const HEADER_MAP = {
   cpc: 'CPC',
   viewability: 'Viewability',
 };
-const CONFIG_HEADERS = ['ID','Pessoa','Operação','PaginaQueda','Parte','Canal','URLs (;)','Rede','Moeda'];
+const CONFIG_HEADERS = ['ID','Pessoa','Operação','Suboperação','PaginaQueda','Parte','Canal','URLs (;)','Rede','Moeda'];
 
 // ============================================================
 // CONFIGURAÇÃO DE PALAVRAS-CHAVE DOS BLOCOS DE ANÚNCIO
@@ -33,6 +33,7 @@ const BLOCK_KEYWORDS = {
   MOB_TOP:          ['mob_top', 'mobile_top'],
   MOB_INTERSTITIAL: ['mob_interstitial', 'mobile_interstitial'],
   MOB_OFFERWALL:    ['mob_offerwall', 'mob_rewarded', 'mobile_offerwall', 'mobile_rewarded'],
+  MOB_CONTENT:      ['mob_content'],
   REWARDED_QUIZ:    ['rewarded']
 };
 
@@ -42,8 +43,12 @@ const BLOCK_LABELS = {
   MOB_TOP_P1:          'mob_top (P1)',
   MOB_INTERSTITIAL_P1: 'mob_interstitial (P1)',
   MOB_OFFERWALL_P1:    'mob_offerwall (P1)',
+  MOB_CONTENT_P1:      'mob_content (P1)',
   MOB_OFFERWALL_P2:    'mob_offerwall (P2)',
   MOB_TOP_P2:          'mob_top (P2)',
+  MOB_INTERSTITIAL_P2: 'mob_interstitial (P2)',
+  MOB_CONTENT_P2:      'mob_content (P2)',
+  MOB_INTERSTITIAL_QUIZ: 'mob_interstitial (Quiz)',
   REWARDED_QUIZ:       'rewarded (Quiz)'
 };
 
@@ -199,6 +204,7 @@ function getConfig() {
         id: String(r[idx['ID']] || ''),
         pessoa: pessoa,
         operacao: String(r[idx['Operação']] || '').trim(),
+        suboperacao: String(r[idx['Suboperação']] || '').trim(),
         pagina: String(r[idx['PaginaQueda']] || '').trim(),
         parte: String(r[idx['Parte']] || '').trim(),
         canal: String(r[idx['Canal']] || '').trim(),
@@ -212,22 +218,27 @@ function getConfig() {
       });
     }
   });
-  var pessoasSet = {}, opsByPessoa = {}, paginasByOp = {};
+  var pessoasSet = {}, opsByPessoa = {}, subopsByOp = {}, paginasBySubop = {};
   data.forEach(function(d) {
     pessoasSet[d.pessoa] = true;
     if (!opsByPessoa[d.pessoa]) opsByPessoa[d.pessoa] = {};
     opsByPessoa[d.pessoa][d.operacao] = true;
-    var key = d.pessoa + '||' + d.operacao;
-    if (!paginasByOp[key]) paginasByOp[key] = {};
-    paginasByOp[key][d.pagina] = true;
+    var opKey = d.pessoa + '||' + d.operacao;
+    if (!subopsByOp[opKey]) subopsByOp[opKey] = {};
+    if (d.suboperacao) subopsByOp[opKey][d.suboperacao] = true;
+    var subopKey = d.pessoa + '||' + d.operacao + '||' + d.suboperacao;
+    if (!paginasBySubop[subopKey]) paginasBySubop[subopKey] = {};
+    paginasBySubop[subopKey][d.pagina] = true;
   });
   var pessoas = Object.keys(pessoasSet).sort();
   var opsByPessoaObj = {};
   Object.keys(opsByPessoa).forEach(p => { opsByPessoaObj[p] = Object.keys(opsByPessoa[p]).sort(); });
-  var paginasByOpObj = {};
-  Object.keys(paginasByOp).forEach(k => { paginasByOpObj[k] = Object.keys(paginasByOp[k]).sort(); });
+  var subopsByOpObj = {};
+  Object.keys(subopsByOp).forEach(k => { subopsByOpObj[k] = Object.keys(subopsByOp[k]).sort(); });
+  var paginasBySubopObj = {};
+  Object.keys(paginasBySubop).forEach(k => { paginasBySubopObj[k] = Object.keys(paginasBySubop[k]).sort(); });
 
-  return { rows: data, pessoas: pessoas, opsByPessoa: opsByPessoaObj, paginasByOp: paginasByOpObj };
+  return { rows: data, pessoas: pessoas, opsByPessoa: opsByPessoaObj, subopsByOp: subopsByOpObj, paginasBySubop: paginasBySubopObj };
 }
 
 function upsertConfig(row) {
@@ -239,14 +250,14 @@ function upsertConfig(row) {
   if (row.id) {
     for (var i = 1; i < range.length; i++) {
       if (String(range[i][idx['ID']] || '').trim() === String(row.id).trim()) {
-        var values = [ row.id, row.pessoa, row.operacao, row.pagina, row.parte, row.canal, row.urls, row.rede, row.moeda || 'USD' ];
+        var values = [ row.id, row.pessoa, row.operacao, row.suboperacao, row.pagina, row.parte, row.canal, row.urls, row.rede, row.moeda || 'USD' ];
         sh.getRange(i + 1, 1, 1, values.length).setValues([values]);
         return { ok: true };
       }
     }
   }
 
-  var newValues = [ Utilities.getUuid(), row.pessoa, row.operacao, row.pagina, row.parte, row.canal, row.urls, row.rede, row.moeda || 'USD' ];
+  var newValues = [ Utilities.getUuid(), row.pessoa, row.operacao, row.suboperacao, row.pagina, row.parte, row.canal, row.urls, row.rede, row.moeda || 'USD' ];
   sh.appendRow(newValues);
   return { ok: true };
 }
@@ -394,11 +405,11 @@ function upsertPricingRulesIgoal(rules) {
 /* ============= DASHBOARD ============= */
 function getDashboardData(params) {
   params = params || {};
-  var pessoa = params.pessoa, operacao = params.operacao, paginasSelecionadas = params.paginasSelecionadas || [],
+  var pessoa = params.pessoa, operacao = params.operacao, suboperacao = params.suboperacao, paginasSelecionadas = params.paginasSelecionadas || [],
       startDate = params.startDate, endDate = params.endDate, granularity = params.granularity || 'hour';
   var gran = (granularity === 'day' || granularity === 'last6h' || granularity === 'last3h') ? granularity : 'hour';
   var emptyReturn = { pages: [], compare: [], compareBlocks: [], granularity: gran, seriesChart: [], labelsChart: [], seriesChartByBlock: {}, pricingRulesAdSeleto: [], pricingRulesIgoal: [] };
-  if (!pessoa || !operacao || !paginasSelecionadas.length) return emptyReturn;
+  if (!pessoa || !operacao || !suboperacao || !paginasSelecionadas.length) return emptyReturn;
 
 if (!startDate && !endDate) {
     var today = todayIso_();
@@ -410,7 +421,7 @@ if (!startDate && !endDate) {
     startDate = endDate;
   }
 
-  var cfgAll = getConfig().rows.filter(r => r.pessoa === pessoa && r.operacao === operacao);
+  var cfgAll = getConfig().rows.filter(r => r.pessoa === pessoa && r.operacao === operacao && r.suboperacao === suboperacao);
   var pageIndex = {};
   cfgAll.forEach(r => {
     if (paginasSelecionadas.includes(r.pagina)) {
@@ -522,11 +533,15 @@ if (!startDate && !endDate) {
       if (matchesKeywords_(s, BLOCK_KEYWORDS.MOB_TOP))          return {label: BLOCK_LABELS.MOB_TOP_P1,          parte: 'P1'};
       if (matchesKeywords_(s, BLOCK_KEYWORDS.MOB_INTERSTITIAL)) return {label: BLOCK_LABELS.MOB_INTERSTITIAL_P1, parte: 'P1'};
       if (matchesKeywords_(s, BLOCK_KEYWORDS.MOB_OFFERWALL))    return {label: BLOCK_LABELS.MOB_OFFERWALL_P1,    parte: 'P1'};
+      if (matchesKeywords_(s, BLOCK_KEYWORDS.MOB_CONTENT))      return {label: BLOCK_LABELS.MOB_CONTENT_P1,      parte: 'P1'};
     } else if (parteName === 'P2') {
-      if (matchesKeywords_(s, BLOCK_KEYWORDS.MOB_OFFERWALL)) return {label: BLOCK_LABELS.MOB_OFFERWALL_P2, parte: 'P2'};
-      if (matchesKeywords_(s, BLOCK_KEYWORDS.MOB_TOP))       return {label: BLOCK_LABELS.MOB_TOP_P2,       parte: 'P2'};
+      if (matchesKeywords_(s, BLOCK_KEYWORDS.MOB_OFFERWALL))    return {label: BLOCK_LABELS.MOB_OFFERWALL_P2,    parte: 'P2'};
+      if (matchesKeywords_(s, BLOCK_KEYWORDS.MOB_TOP))          return {label: BLOCK_LABELS.MOB_TOP_P2,          parte: 'P2'};
+      if (matchesKeywords_(s, BLOCK_KEYWORDS.MOB_INTERSTITIAL)) return {label: BLOCK_LABELS.MOB_INTERSTITIAL_P2, parte: 'P2'};
+      if (matchesKeywords_(s, BLOCK_KEYWORDS.MOB_CONTENT))      return {label: BLOCK_LABELS.MOB_CONTENT_P2,      parte: 'P2'};
     } else if (parteName === 'Quiz') {
-      if (matchesKeywords_(s, BLOCK_KEYWORDS.REWARDED_QUIZ)) return {label: BLOCK_LABELS.REWARDED_QUIZ, parte: 'Quiz'};
+      if (matchesKeywords_(s, BLOCK_KEYWORDS.MOB_INTERSTITIAL)) return {label: BLOCK_LABELS.MOB_INTERSTITIAL_QUIZ, parte: 'Quiz'};
+      if (matchesKeywords_(s, BLOCK_KEYWORDS.REWARDED_QUIZ))    return {label: BLOCK_LABELS.REWARDED_QUIZ,       parte: 'Quiz'};
     }
     return null;
   }
@@ -666,7 +681,7 @@ if (!startDate && !endDate) {
 
   var seriesChart = generateSeries_(pageHourAgg, (pg, ms) => `${pg}||${ms}`);
   var seriesChartByBlock = {};
-  [BLOCK_LABELS.MOB_TOP_P1, BLOCK_LABELS.MOB_INTERSTITIAL_P1, BLOCK_LABELS.MOB_OFFERWALL_P1, BLOCK_LABELS.MOB_OFFERWALL_P2, BLOCK_LABELS.MOB_TOP_P2, BLOCK_LABELS.REWARDED_QUIZ].forEach(blockLabel => {
+  [BLOCK_LABELS.MOB_TOP_P1, BLOCK_LABELS.MOB_INTERSTITIAL_P1, BLOCK_LABELS.MOB_OFFERWALL_P1, BLOCK_LABELS.MOB_CONTENT_P1, BLOCK_LABELS.MOB_OFFERWALL_P2, BLOCK_LABELS.MOB_TOP_P2, BLOCK_LABELS.MOB_INTERSTITIAL_P2, BLOCK_LABELS.MOB_CONTENT_P2, BLOCK_LABELS.MOB_INTERSTITIAL_QUIZ, BLOCK_LABELS.REWARDED_QUIZ].forEach(blockLabel => {
     seriesChartByBlock[blockLabel] = generateSeries_(blockHourAgg, (pg, ms) => `${pg}||${blockLabel}||${ms}`);
   });
   compare.sort((a,b) => b.revenue - a.revenue);
@@ -706,8 +721,10 @@ if (!startDate && !endDate) {
   var operationsMap = {};
   cfgRows.forEach(function(row){
     if (!operationsMap[row.operacao]) operationsMap[row.operacao] = { operacao: row.operacao, pages: {} };
-    if (!operationsMap[row.operacao].pages[row.pagina]) operationsMap[row.operacao].pages[row.pagina] = {};
-    operationsMap[row.operacao].pages[row.pagina][row.parte] = {
+    if (!operationsMap[row.operacao].suboperacoes) operationsMap[row.operacao].suboperacoes = {};
+    if (!operationsMap[row.operacao].suboperacoes[row.suboperacao]) operationsMap[row.operacao].suboperacoes[row.suboperacao] = { suboperacao: row.suboperacao, pages: {} };
+    if (!operationsMap[row.operacao].suboperacoes[row.suboperacao].pages[row.pagina]) operationsMap[row.operacao].suboperacoes[row.suboperacao].pages[row.pagina] = {};
+    operationsMap[row.operacao].suboperacoes[row.suboperacao].pages[row.pagina][row.parte] = {
       canal: row.canal,
       urls: row.urls || [],
       rede: row.rede,
@@ -718,6 +735,7 @@ if (!startDate && !endDate) {
   var entries = cfgRows.map(function(row){
     return {
       operacao: row.operacao,
+      suboperacao: row.suboperacao,
       pagina: row.pagina,
       parte: row.parte,
       canal: row.canal,
@@ -864,11 +882,15 @@ if (!startDate && !endDate) {
       if (matchesKeywords_(s, BLOCK_KEYWORDS.MOB_TOP))          return { label: BLOCK_LABELS.MOB_TOP_P1,          parte: 'P1' };
       if (matchesKeywords_(s, BLOCK_KEYWORDS.MOB_INTERSTITIAL)) return { label: BLOCK_LABELS.MOB_INTERSTITIAL_P1, parte: 'P1' };
       if (matchesKeywords_(s, BLOCK_KEYWORDS.MOB_OFFERWALL))    return { label: BLOCK_LABELS.MOB_OFFERWALL_P1,    parte: 'P1' };
+      if (matchesKeywords_(s, BLOCK_KEYWORDS.MOB_CONTENT))      return { label: BLOCK_LABELS.MOB_CONTENT_P1,      parte: 'P1' };
     } else if (parteName === 'P2') {
-      if (matchesKeywords_(s, BLOCK_KEYWORDS.MOB_OFFERWALL)) return { label: BLOCK_LABELS.MOB_OFFERWALL_P2, parte: 'P2' };
-      if (matchesKeywords_(s, BLOCK_KEYWORDS.MOB_TOP))       return { label: BLOCK_LABELS.MOB_TOP_P2,       parte: 'P2' };
+      if (matchesKeywords_(s, BLOCK_KEYWORDS.MOB_OFFERWALL))    return { label: BLOCK_LABELS.MOB_OFFERWALL_P2,    parte: 'P2' };
+      if (matchesKeywords_(s, BLOCK_KEYWORDS.MOB_TOP))          return { label: BLOCK_LABELS.MOB_TOP_P2,          parte: 'P2' };
+      if (matchesKeywords_(s, BLOCK_KEYWORDS.MOB_INTERSTITIAL)) return { label: BLOCK_LABELS.MOB_INTERSTITIAL_P2, parte: 'P2' };
+      if (matchesKeywords_(s, BLOCK_KEYWORDS.MOB_CONTENT))      return { label: BLOCK_LABELS.MOB_CONTENT_P2,      parte: 'P2' };
     } else if (parteName === 'Quiz') {
-      if (matchesKeywords_(s, BLOCK_KEYWORDS.REWARDED_QUIZ)) return { label: BLOCK_LABELS.REWARDED_QUIZ, parte: 'Quiz' };
+      if (matchesKeywords_(s, BLOCK_KEYWORDS.MOB_INTERSTITIAL)) return { label: BLOCK_LABELS.MOB_INTERSTITIAL_QUIZ, parte: 'Quiz' };
+      if (matchesKeywords_(s, BLOCK_KEYWORDS.REWARDED_QUIZ))    return { label: BLOCK_LABELS.REWARDED_QUIZ,       parte: 'Quiz' };
     }
     return null;
   }
@@ -969,7 +991,7 @@ if (!startDate && !endDate) {
       var adunitLower = adunit.toLowerCase();
 
       // Agrega tudo por página (para o Total da Página)
-      var pageKey = entry.operacao + '||' + entry.pagina;
+      var pageKey = entry.operacao + '||' + entry.suboperacao + '||' + entry.pagina;
       if (!pageAgg[pageKey]) pageAgg[pageKey] = blankAgg_();
       pushRow_(pageAgg[pageKey], row);
 
@@ -986,7 +1008,7 @@ if (!startDate && !endDate) {
       // Agrega por bloco classificado
       var classification = classifyBlock_(adunit, entry.parte);
       if (!classification) return;
-      var baseKey = entry.operacao + '||' + entry.pagina + '||' + classification.label;
+      var baseKey = entry.operacao + '||' + entry.suboperacao + '||' + entry.pagina + '||' + classification.label;
       if (!blockAgg[baseKey]) blockAgg[baseKey] = blankAgg_();
       pushRow_(blockAgg[baseKey], row);
       var hourKey = baseKey + '||' + ms;
@@ -1000,8 +1022,9 @@ if (!startDate && !endDate) {
     Object.keys(blockAgg).forEach(function(key){
       if (key.indexOf(opName + '||') !== 0) return;
       var parts = key.split('||');
-      var pageName = parts[1];
-      var label = parts[2];
+      var subopName = parts[1];
+      var pageName = parts[2];
+      var label = parts[3];
       var agg = blockAgg[key];
       var metrics = finalizeAgg_(agg);
       var suggestionBasis = buildSuggestionBasis_(key, blockHourAgg);
@@ -1009,18 +1032,19 @@ if (!startDate && !endDate) {
       if (label.indexOf('(P1)') !== -1) parte = 'P1';
       else if (label.indexOf('(P2)') !== -1) parte = 'P2';
       else if (label.indexOf('(Quiz)') !== -1) parte = 'Quiz';
-      blocks.push({ page: pageName, label: label, parte: parte, metrics: metrics, suggestionBasis: suggestionBasis });
+      blocks.push({ suboperacao: subopName, page: pageName, label: label, parte: parte, metrics: metrics, suggestionBasis: suggestionBasis });
     });
     blocks.sort(function(a,b){
       if (a.page !== b.page) return String(a.page || '').localeCompare(String(b.page || ''));
       return String(a.label || '').localeCompare(String(b.label || ''));
     });
 
-    // Monta o Comparativo — Total da Página para esta operação
-    var compareByPage = [];
-    var pagesInOp = Object.keys(operationsMap[opName].pages);
-    pagesInOp.forEach(function(pageName){
-      var pageKey = opName + '||' + pageName;
+    var subops = Object.keys(operationsMap[opName].suboperacoes || {}).map(function(subName){
+      var compareByPage = [];
+      var subBlocks = blocks.filter(function(b){ return b.suboperacao === subName; });
+      var pagesInSubop = Object.keys((operationsMap[opName].suboperacoes[subName] || {}).pages || {});
+      pagesInSubop.forEach(function(pageName){
+      var pageKey = opName + '||' + subName + '||' + pageName;
       var pageMet = finalizeAgg_(pageAgg[pageKey] || blankAgg_());
       var p1p2Raw = p1p2Agg[pageKey] || blankAgg_();
       var reqInt = p1InterstReqMap[pageKey] || 0;
@@ -1031,7 +1055,7 @@ if (!startDate && !endDate) {
       var cpcP1P2 = clkP1P2 > 0 ? revP1P2 / clkP1P2 : 0;
       var interactionRateCapped = Math.max(0, Math.min(interactionRate, 100));
       var cpcCorrigido = cpcP1P2 * (interactionRateCapped / 100);
-      compareByPage.push({
+        compareByPage.push({
         page: pageName,
         revenue: pageMet.revenue,
         impressions: pageMet.impressions,
@@ -1049,10 +1073,11 @@ if (!startDate && !endDate) {
         revenueP1P2: revP1P2,
         clicksP1P2: clkP1P2
       });
+      });
+      compareByPage.sort(function(a, b){ return b.revenue - a.revenue; });
+      return { suboperacao: subName, blocks: subBlocks, compareByPage: compareByPage };
     });
-    compareByPage.sort(function(a, b){ return b.revenue - a.revenue; });
-
-    return { operacao: opName, blocks: blocks, compareByPage: compareByPage };
+    return { operacao: opName, suboperacoes: subops };
   });
 
   return { operations: operations };
